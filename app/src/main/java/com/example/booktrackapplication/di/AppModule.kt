@@ -1,6 +1,16 @@
 package com.example.booktrackapplication.di
 
 import android.util.Log
+import com.example.booktrack.data.repository.auth.AuthRepository
+import com.example.booktrack.data.repository.auth.AuthRepositoryImpl
+import com.example.booktrack.data.repository.main.MainRepository
+import com.example.booktrack.data.repository.main.MainRepositoryImpl
+import com.example.booktrackapplication.data.datastore.DataStoreManager
+import com.example.booktrackapplication.data.remote.AuthApiService
+import com.example.booktrackapplication.data.remote.MainApiService
+import com.example.booktrackapplication.utils.dataStore
+import com.example.booktrackapplication.viewmodel.MainViewmodel
+import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -13,6 +23,8 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
@@ -46,4 +58,15 @@ val appModule = module {
             }
         }
     }
+
+    single { AuthApiService(get(), get()) }
+    single { MainApiService(get(), get()) }
+
+    single<AuthRepository> { AuthRepositoryImpl(get(), get()) }
+    single<MainRepository> { MainRepositoryImpl(get(), get()) }
+
+    viewModel { RegistrationViewModel(get(), get()) }
+    single { MainViewmodel(get(), get()) }
+
+    single { DataStoreManager(androidContext().dataStore) }
 }

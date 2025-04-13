@@ -1,3 +1,62 @@
 <resources>
     <string name="app_name">BookTrackApplication</string>
+
+    //LOGIN
+    <string name="selamat_datang">Selamat Datang</string>
+    <string name="masukan_identitas">Silakan masukan nomor identitas dan juga kata sandi anda</string>
+    <string name="nomor_identitas">Nomor Identitas</string>
+    <string name="masukan_nomor_identitas">Masukan Nomor Identitas</string>
+    <string name="kata_sandi">Kata Sandi</string>
+    <string name="masukan_kata_sandi">Masukan Kata Sandi</string>
+    <string name="ingat_saya">Ingat Saya</string>
+    <string name="lupa">Lupa Kata Sandi</string>
+    <string name="aktivasi_akun">Aktivasi Akun</string>
+    <string name="hide_password">Hide</string>
+    <string name="show_password">Show</string>
+
+    //AKTIVASI
+    <string name="aktivasi">Aktivasi Akun</string>
+    <string name="akun_anda">Akun anda belum diaktivasi. Silakan isi data dibawah ini</string>
+    <string name="masuk">Masuk</string>
+    <string name="masukan_nomor_telepon">Masukan Nomor Telefon</string>
+    <string name="kata_sandi_aktivasi">Kata Sandi</string>
+    <string name="kata_sandi_lama">Kata Sandi Lama</string>
+    <string name="kata_sandi_baru">Kata Sandi Baru</string>
+
+
+    //HOME
+    <string name="lihat">Lihat Jadwal</string>
+
+    //DETAIL NEWS LIST
+    <string name="berita_terbaru">Berita Terbaru</string>
+
+    //DETAIL BOOK
+    <string name="detail_buku">Detail Buku</string>
+    <string name="footer1">Apabila nomor siswa yang tertera tidak dapat dihubungi harap</string>
+    <string name="footer2">melaporkan ke admin perpustakaan SMKN 7 Semarang.</string>
+
+    //NEWS CONTENT
+    <string name="content_book1">Sekolah Menengah Kejuruan Negeri 7 Semarang (Stemba) telah meluncurkan sistem digitalisasi dalam proses pengambilan buku mata pelajaran. Inovasi ini bertujuan untuk meningkatkan efisiensi dan meminimalkan kesalahan yang sering terjadi selama proses manual, seperti kehilangan atau pertukaran buku.</string>
+    <string name="content_book1_1">Selain itu, pihak sekolah juga berencana untuk terus mengembangkan sistem ini dengan fitur pelacakan buku yaitu siswa dan staf dapat mengakses, memantau keberadaan buku secara akurat.</string>
+    <string name="content_book1_2">Dengan adanya inovasi ini, Stemba berharap dapat menjadi pelopor dalam penerapan teknologi digital di lingkungan pendidikan, memberikan manfaat nyata bagi siswa dan seluruh komunitas sekolah.</string>
+
+    //PROFILE
+    <string name="nama">Nama Siswa</string>
+    <string name="nomor">Nomor Telepon</string>
+    <string name="nis">NIS</string>
+    <string name="nisn">NISN</string>
+    <string name="simpan">Simpan Perubahan</string>
+    <string name="masukan_nama">Masukan Nama</string>
+    <string name="masukan_nomor">Masukan Nomor</string>
+    <string name="masukan_nis">Masukan NIS</string>
+    <string name="masukan_nisn">Masukan NISN</string>
+
+    //HISTORY
+    <string name="detail">Detail</string>
+
+    //PEMINJAMAN BUKU
+    <string name="submit_buku">Submit Peminjaman Buku</string>
+    <string name="lanjut">Lanjut Scan Buku</string>
+    <string name="kepada">Kepada seluruh siswa - siswi SMKN 7 Semarang yang akan melakukan pemindaian buku diharapkan untuk mencermati berikut:  </string>
+
 </resources>

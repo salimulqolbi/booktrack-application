@@ -1,16 +1,20 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
+//    id("kotlin-kapt")
+//    id("com.google.dagger.hilt.android")
+    kotlin("plugin.serialization") version "2.1.20"
     alias(libs.plugins.kotlin.android)
 }
 
 android {
     namespace = "com.example.booktrackapplication"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.booktrackapplication"
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -40,7 +44,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "2.1.0"
     }
     packaging {
         resources {
