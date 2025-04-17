@@ -66,7 +66,7 @@ val appModule = module {
     single<MainRepository> { MainRepositoryImpl(get(), get()) }
 
     viewModel { RegistrationViewModel(get(), get()) }
-    single { MainViewmodel(get(), get()) }
+    viewModel { MainViewmodel(get(), get()) }
 
     single { DataStoreManager(androidContext().dataStore) }
 }

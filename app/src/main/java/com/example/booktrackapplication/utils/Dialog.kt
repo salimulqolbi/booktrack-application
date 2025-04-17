@@ -40,6 +40,8 @@ fun ConfirmBookDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+
+    Log.d("book", "data buku: $book")
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(12.dp),

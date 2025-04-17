@@ -1,5 +1,6 @@
 package com.example.booktrack.data.repository.main
 
+import android.util.Log
 import com.example.booktrack.data.response.BookResponse
 import com.example.booktrack.data.response.BorrowStatusResponse
 import com.example.booktrack.data.response.CurriculumResponse
@@ -8,8 +9,11 @@ import com.example.booktrack.data.response.ValidateBorrowingDateResponse
 import com.example.booktrack.utils.Resource
 import com.example.booktrackapplication.data.datastore.DataStoreManager
 import com.example.booktrackapplication.data.remote.MainApiService
+import com.example.booktrackapplication.data.response.BookLoanRequest
+import com.example.booktrackapplication.data.response.BorrowBooksResponse
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
+import java.lang.Error
 
 class MainRepositoryImpl(
     private val apiService: MainApiService,
@@ -68,16 +72,35 @@ class MainRepositoryImpl(
 
     override suspend fun getSchedule(): Resource<EventsScheduleResponse> {
         return try {
-            val token =
-                dataStoreManager.getToken() ?: return Resource.Error("TOken tidak ditemukan")
+            val token = dataStoreManager.getToken() ?: return Resource.Error("TOken tidak ditemukan")
+            Log.d("SCHEDULE", "Token: $token")
             if (token == null) {
                 Resource.Error("Token not found")
             } else {
                 val result = apiService.getSchedule(token)
                 Resource.Success(result)
+
             }
+
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Unexpected error")
+        }
+    }
+
+    override suspend fun submitBorrowedBook(
+        bookCodes: BookLoanRequest
+    ): Resource<BorrowBooksResponse> {
+        return try {
+            val token = dataStoreManager.getToken() ?: return Resource.Error("Token not found")
+            val result = apiService.submitBorrowedBook(bookCodes, token)
+            if(result.success) {
+                Resource.Success(result)
+            } else {
+                // response success=false tapi tidak error di jaringan
+                Resource.Error(result.message)
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Gagal melakukan peminjaman")
         }
     }
 }

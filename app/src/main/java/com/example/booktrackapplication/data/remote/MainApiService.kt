@@ -6,6 +6,8 @@ import com.example.booktrack.data.response.BorrowStatusResponse
 import com.example.booktrack.data.response.CurriculumResponse
 import com.example.booktrack.data.response.EventsScheduleResponse
 import com.example.booktrack.data.response.ValidateBorrowingDateResponse
+import com.example.booktrackapplication.data.response.BookLoanRequest
+import com.example.booktrackapplication.data.response.BorrowBooksResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -13,10 +15,13 @@ import io.ktor.client.request.get
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 class MainApiService (
     private val client: HttpClient,
@@ -126,6 +131,33 @@ class MainApiService (
                 response.body()
             } catch (e: Exception) {
                 Log.e("ScheduleApi", "Error getSchedule: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    suspend fun submitBorrowedBook(bookCodes: BookLoanRequest, token: String): BorrowBooksResponse {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: HttpResponse = client.post{
+                    url("$baseUrl/borrow-books")
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                    setBody(bookCodes)
+                }
+
+                val body = response.bodyAsText()
+                Log.d("LoanApi", "submitLoan: $body")
+                response.body()
+            } catch (e: ClientRequestException) {
+                val errorBody = e.response.bodyAsText()
+                Log.e("LoanApi", "submitLoan (client error): $errorBody")
+                // biar error detail bisa diproses di repo / VM
+                Json.decodeFromString<BorrowBooksResponse>(errorBody)
+            } catch (e: Exception) {
+                Log.e("LoanApi", "submitLoan error: ${e.message}")
                 throw e
             }
         }

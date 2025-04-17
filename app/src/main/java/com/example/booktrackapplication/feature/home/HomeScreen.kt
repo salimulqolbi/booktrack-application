@@ -1,6 +1,5 @@
 package com.example.booktrackapplication.feature.home
 
-//import androidx.compose.material.ButtonDefaults
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -39,6 +38,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.booktrack.utils.HomeProfileImage
 import com.example.booktrack.utils.NewsList
@@ -71,50 +73,81 @@ import com.example.booktrackapplication.data.NewsData
 import com.example.booktrackapplication.ui.theme.ManropeFamily
 import com.example.booktrackapplication.viewmodel.MainViewmodel
 import com.example.booktrackapplication.viewmodel.RegistrationViewModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 //import org.koin.androidx.compose.get
 
-val searchHistory = listOf(
-    "BA - 7862 - SD76",
-    "CY - 9711 - BH73",
-    "MK - 1788 - 2222"
-)
+//val searchHistory = listOf(
+//    "BA - 7862 - SD76",
+//    "CY - 9711 - BH73",
+//    "MK - 1788 - 2222"
+//)
 
 @Composable
 fun HomeScreen(
     navController: NavController,
-    viewModel: RegistrationViewModel = koinViewModel()
+    viewModel: RegistrationViewModel = koinViewModel(),
+    mainViewmodel: MainViewmodel = koinViewModel()
 ) {
-
-    val mainViewmodel: MainViewmodel = koinViewModel()
-
-    val user by viewModel.user.collectAsStateWithLifecycle()
+    val user by viewModel.user.collectAsState()
 
     val isLoading = user == null
-    var isLoading2 by remember { mutableStateOf(false) }
-    val name = user?.name ?: " "
+
+    val searchHistory = mainViewmodel.searchHistory
 
     LaunchedEffect(isLoading) {
         Log.d("HOME", "User Loaded? ${user != null}")
     }
 
-    Log.d("HOME", "Render HomeScreen. User: ${user?.name}")
-
     val image = R.drawable.anonimus
 
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
+    val scannedBook = mainViewmodel.scannedBook
 
     BackHandler(enabled = isSearchActive) {
         isSearchActive = false
         focusManager.clearFocus()
     }
 
+    var hasNavigated by remember { mutableStateOf(false) }
+
+    LaunchedEffect(scannedBook) {
+        if (!hasNavigated && scannedBook != null) {
+            hasNavigated = true
+            navController.navigate("bookDetail") {
+                launchSingleTop = true
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        mainViewmodel.reset()
+    }
+
+
+
+//    LaunchedEffect(scannedBook) {
+//        scannedBook?.let {
+//            navController.navigate("bookDetail") {
+//                launchSingleTop = true
+//            }
+//        }
+//    }
+
+    var searchText by rememberSaveable { mutableStateOf("") }
+
+    val state by mainViewmodel.uiState.collectAsState()
+
+    var shouldNavigateToSchedule by rememberSaveable { mutableStateOf(false) }
+
+    val schedules = state.schedules
+
+//    val history = mainViewmodel.searchHistory
+
     if (isLoading) {
-        // Kasih shimmer, loading, atau sekadar Spacer
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -167,17 +200,14 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(
                         top = 20.dp,
-//                    bottom = 16.dp,
                         start = 20.dp,
                         end = 20.dp
                     ),
-//                        .height(48.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 var active by rememberSaveable { mutableStateOf(false) }
-                var searchText by rememberSaveable { mutableStateOf("") }
 
                 val searchBarOffset by animateDpAsState(
                     targetValue = if (isSearchActive) 0.dp else 20.dp,
@@ -188,7 +218,11 @@ fun HomeScreen(
                     placeholderText = "Apa yang ingin anda cari?",
                     query = searchText,
                     onQueryChange = { searchText = it },
-                    onSearch = { /* Dummy search action */ },
+                    onSearch = {
+                        mainViewmodel.fetchBook(searchText)
+                        mainViewmodel.addToSearchHistory(searchText)
+                        searchText = ""
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
@@ -288,7 +322,19 @@ fun HomeScreen(
 //                                )
 //
 //                                Button(
-//                                    onClick = { navController.navigate("schedule_list") },
+//                                    onClick = {
+//                                        mainViewmodel.getSchedule(
+//                                            onSuccess = {
+//                                                navController.navigate("schedule_list") {
+//                                                    launchSingleTop = true
+//                                                    popUpTo("home") { inclusive = true }  // Menutup stack sebelumnya
+//                                                }
+//                                            },
+//                                            onError = {
+//                                                Log.e("Schedule", "Gagal: $it")
+//                                            }
+//                                        )
+//                                    },
 //                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff2846CF)),
 //                                    modifier = Modifier
 //                                        .padding(start = 16.dp, top = 12.dp)
@@ -394,12 +440,25 @@ fun HomeScreen(
 
                         Button(
                             onClick = {
-//                                navController.navigate("schedule_list")
-                                isLoading2 = true
-                                mainViewmodel.getSchedule {
-                                    isLoading2 = false
-                                    navController.navigate("schedule_list")
+//                                shouldNavigateToSchedule = true
+//                                mainViewmodel.getSchedule(
+//                                    onSuccess = {
+//                                        navController.navigate("schedule_list") {
+//                                            launchSingleTop = true
+//                                            popUpTo("home") {
+//                                                inclusive = true
+//                                            }  // Menutup stack sebelumnya
+//                                        }
+//                                    },
+//                                    onError = {
+//                                        Log.e("Schedule", "Gagal: $it")
+//                                    }
+//                                )
+
+                                navController.navigate("schedule_list") {
+                                    launchSingleTop = true
                                 }
+
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xff2846CF)
@@ -433,20 +492,6 @@ fun HomeScreen(
                             }
                         }
                     }
-
-//                    Card(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .clip(RoundedCornerShape(10.dp))
-//                    ) {
-////                        Image(
-////                            painter = painterResource(R.drawable.background),
-////                            contentDescription = "Card Event",
-////                            modifier = Modifier.fillMaxWidth()
-////                        )
-//
-//
-//                    }
                 }
             }
 
@@ -630,7 +675,10 @@ fun HomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 20.dp),
+                                .padding(bottom = 20.dp)
+                                .clickable {
+                                    mainViewmodel.fetchBook(searchText)
+                                },
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
@@ -642,13 +690,15 @@ fun HomeScreen(
                                 color = Color(0xff111111)
                             )
 
-
                             Text(
                                 "Hapus Semua",
                                 fontSize = 12.sp,
                                 fontFamily = ManropeFamily,
                                 fontWeight = FontWeight.Medium,
-                                color = Color(0xff2846CF)
+                                color = Color(0xff2846CF),
+                                modifier = Modifier.clickable {
+                                    mainViewmodel.clearSearchHistory()
+                                }
                             )
                         }
 
@@ -666,7 +716,12 @@ fun HomeScreen(
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier
                                             .padding(bottom = 12.dp)
-                                            .clickable { }
+                                            .clickable {
+                                                searchText = history
+                                                mainViewmodel.fetchBook(history)
+                                                mainViewmodel.addToSearchHistory(history)
+                                                navController.navigate("bookDetail")
+                                            }
                                     ) {
                                         Image(
                                             painter = painterResource(id = R.drawable.tabler_icon_clock),
@@ -692,7 +747,9 @@ fun HomeScreen(
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .size(16.dp)
-                                                .clickable { }
+                                                .clickable {
+                                                    mainViewmodel.removeFromSearchHistory(history)
+                                                }
                                         )
                                     }
                                 }
@@ -827,7 +884,6 @@ fun HomeScreen(
                                         overflow = TextOverflow.Clip
                                     )
                                 }
-
                             }
                         }
                     }
@@ -835,13 +891,4 @@ fun HomeScreen(
             }
         }
     }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomePreview(
-) {
-    val navController = rememberNavController()
-    HomeScreen(navController = navController)
 }

@@ -1,4 +1,5 @@
 package com.example.booktrack.feature
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Text
@@ -8,11 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.navigation.NavHostController
-import kotlinx.coroutines.delay
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.booktrack.viewmodel.RegistrationViewModel
+import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import org.koin.androidx.compose.koinViewModel
 
 //import com.example.booktrack.navigation.AuthScreen
@@ -25,7 +24,7 @@ fun SplashScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-//        navController.navigate("register") {
+//        navController.navigate("login") {
 //            popUpTo("splash") { inclusive = true }
 //        }
         val token = viewModel.getToken()

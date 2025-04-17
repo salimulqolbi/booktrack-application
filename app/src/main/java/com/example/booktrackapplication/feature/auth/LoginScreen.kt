@@ -2,6 +2,7 @@ package com.example.booktrack.feature.login
 
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -200,7 +201,14 @@ fun LoginScreen(
                                 fontSize = 10.sp,
                                 color = Color(0xff1E1E1E),
                                 fontFamily = ManropeFamily,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.clickable {
+                                    navController.navigate("register") {
+                                        popUpTo("login") {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
                             )
                         }
                     }

@@ -20,20 +20,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.booktrack.data.response.BookData
@@ -60,149 +68,200 @@ fun BookLoanScreen(
 ) {
     val books = viewModel.loanedBooks
 
-    Column(
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val bookCount = uiState.curriculum?.bookCount ?: " "
+
+    val isComplete = books.size == bookCount
+
+    LaunchedEffect(Unit) {
+        Log.d("BookLoanScreen", "Jumlah buku: ${viewModel.loanedBooks.size}")
+    }
+
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, top = 40.dp, end = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Card(
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(Color(0XFFF7F8FC)),
-                border = BorderStroke(1.dp, Color(0xffEBEBEB)),
-                modifier = Modifier.size(44.dp)
+            .padding(top = 24.dp),
+        topBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(top = 24.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
+                IconButton(
+                    onClick = {
+                        navController.navigate("main") {
+                            launchSingleTop = true
+                        }
+                    },
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xffF7F8FC))
+                        .border(1.dp, Color(0xffEBEBEB), CircleShape)
+                        .align(Alignment.CenterStart)
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = null,
+                        painter = painterResource(id = R.drawable.arrow_right),
+                        contentDescription = "Back",
                         tint = Color(0xff2846CF),
-                        modifier = Modifier.size(30.dp)
                     )
                 }
+
+                Text(
+                    "Peminjaman Buku",
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
-
-            Text(
-                text = "Peminjaman Buku",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            Card(
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(Color.Transparent),
-                modifier = Modifier.size(44.dp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = null,
-                        tint = Color.Transparent,
-                        modifier = Modifier.size(24.dp),
-
-                        )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            LazyColumn(
+        },
+        content = { paddingValues ->
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 130.dp)
+                    .padding(paddingValues)
+                    .background(Color.White)
             ) {
-                items(books) { book ->
-                    BookItem(
-                        book = book,
-                        onDeleteClick = {
-                            viewModel.removeBook(book.code)
-                        }
-                    )
-                }
-
-                item {
-                    Button(
-                        onClick = {},
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    LazyColumn(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp, top = 20.dp, end = 20.dp),
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xff2846CF))
+                            .fillMaxSize()
+                            .padding(bottom = 130.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.submit_buku),
-                                fontSize = 12.sp,
-                                color = Color(0xffFFFFFF),
-                                fontFamily = ManropeFamily,
-                                fontWeight = FontWeight.SemiBold
-                            )
-
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                                contentDescription = null,
-                                tint = Color(0xffFFFFFF),
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(72.dp)
-                            .padding(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 24.dp),
-                        shape = CircleShape,
-                        border = BorderStroke(1.dp, Color(0xffEBEBEB)),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xff2846CF).copy(
-                                alpha = 0.1f
-                            )
-                        )
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "${books.size}/12",
-                                fontSize = 12.sp,
-                                color = Color(0xff111111).copy(0.6f),
-                                fontFamily = ManropeFamily,
-                                fontWeight = FontWeight.SemiBold,
-                                textAlign = TextAlign.Center
+                        items(books) { book ->
+                            BookItem(
+                                book = book,
+                                onDeleteClick = {
+                                    viewModel.removeBook(book.code)
+                                }
                             )
                         }
                     }
                 }
             }
+        },
+        bottomBar = {
+            Column {
+                Button(
+                    onClick = {
+                        if (isComplete) {
+                            viewModel.submitBorrowedBooks()
+//                            viewModel.submitBorrowedBooks { success ->
+//                                if (success) {
+//                                    navController.navigate("main")
+//                                }
+//                            }
+                        } else {
+                            navController.navigate("scan_code") {
+                                launchSingleTop = true
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .padding(start = 20.dp, top = 20.dp, end = 20.dp),
+                    shape = CircleShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff2846CF))
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if(isComplete) stringResource(R.string.submit_buku) else stringResource(id = R.string.lanjut),
+                            fontSize = 12.sp,
+                            color = Color(0xffFFFFFF),
+                            fontFamily = ManropeFamily,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Icon(
+                            imageVector = if(isComplete) Icons.AutoMirrored.Filled.ArrowForwardIos else Icons.Default.Add ,
+                            contentDescription = null,
+                            tint = Color(0xffFFFFFF),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .background(Color.White)
+                        .padding(start = 20.dp, top = 8.dp, end = 20.dp, bottom = 24.dp),
+                    shape = CircleShape,
+                    border = BorderStroke(1.dp, Color(0xffEBEBEB)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xff2846CF).copy(
+                            alpha = 0.1f
+                        )
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0xff2846CF).copy(alpha = 0.1f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${books.size}/$bookCount",
+                            fontSize = 12.sp,
+                            color = Color(0xff111111).copy(0.6f),
+                            fontFamily = ManropeFamily,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
         }
+    )
+
+    uiState.submitMessage?.let { message ->
+        AlertDialog(
+            onDismissRequest = {  },
+            title = { Text("Peminjaman Berhasil") },
+            text = { Text(message) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.clearSuccessFlag()
+                    navController.navigate("home") {
+                        popUpTo("book_loan") { inclusive = true }
+                    }
+                }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+
+    uiState.errorMessage?.let { error ->
+        AlertDialog(
+            onDismissRequest = { viewModel.clearError() },
+            title = { Text("Peminjaman Gagal") },
+            text = { Text(error) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.clearError()
+                }) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }
+
+
 
 @Composable
 fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
@@ -233,6 +292,7 @@ fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
                     Log.e("AsyncImage", "Gagal load gambar: ${it.result.throwable}")
                 }
             )
+            Log.d("book", "${book.coverUrl}")
         }
 
         Spacer(modifier = Modifier.width(8.dp))

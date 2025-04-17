@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.example.booktrackapplication.R
 import com.example.booktrackapplication.viewmodel.MainViewmodel
 import org.koin.androidx.compose.koinViewModel
@@ -206,25 +208,16 @@ val warningList2 = listOf(
 @Composable
 fun ScanWarningDialog(
     onDismissRequest: () -> Unit,
-    onNavigateToScan: () -> Unit
+    navController: NavController,
 ) {
 
     val viewModel: MainViewmodel = koinViewModel()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsState()
 
-//    LaunchedEffect(uiState.isSuccess) {
-//        if (uiState.isSuccess) {
-//            viewModel.clearSuccessFlag()
-//            onDismissRequest()
-//            onNavigateToScan()
-//        }
-//    }
-
-    LaunchedEffect(uiState.isSuccess, uiState.isLoading) {
-        if (uiState.isSuccess && !uiState.isLoading) {
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            navController.navigate("scan_code")
             viewModel.clearSuccessFlag()
-            onDismissRequest()
-            onNavigateToScan()
         }
     }
 
@@ -362,7 +355,9 @@ fun ScanWarningDialog(
                 }
 
                 Button(
-                    onClick = { viewModel.checkBorrowStatusValidation() },
+                    onClick = {
+                        viewModel.checkBorrowStatusValidation()
+                    },
                     border = BorderStroke(1.dp, Color(0xffE1E1E1)),
                     shape = RoundedCornerShape(28.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xff2846CF)),

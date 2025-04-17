@@ -1,13 +1,11 @@
 package com.example.booktrack.feature.profile
 
-import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,8 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Scaffold
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.HeadsetMic
@@ -30,15 +33,11 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.QuestionAnswer
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -56,8 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.booktrack.R
-import com.example.booktrack.viewmodel.RegistrationViewModel
+import com.example.booktrackapplication.R
+import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -187,13 +186,12 @@ fun ProfileScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 12.dp)
-                        ,
+                            .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Logout,
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
                             contentDescription = null,
                             tint = Color(0xffCC5252)
                         )
@@ -213,7 +211,9 @@ fun ProfileScreen(
 @Composable
 fun TopAppBar() {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 40.dp, end = 20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, top = 40.dp, end = 20.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -228,7 +228,7 @@ fun TopAppBar() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowLeft,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = null,
                     tint = Color.Transparent,
                     modifier = Modifier.size(24.dp)
@@ -266,7 +266,7 @@ fun TopAppBar() {
 @Composable
 fun CardProfileMenu(icon: ImageVector, title: String) {
     Column {
-        Row (
+        Row(
             modifier = Modifier.padding(bottom = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

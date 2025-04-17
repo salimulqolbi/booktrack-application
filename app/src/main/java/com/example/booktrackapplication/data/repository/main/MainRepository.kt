@@ -6,6 +6,8 @@ import com.example.booktrack.data.response.CurriculumResponse
 import com.example.booktrack.data.response.EventsScheduleResponse
 import com.example.booktrack.data.response.ValidateBorrowingDateResponse
 import com.example.booktrack.utils.Resource
+import com.example.booktrackapplication.data.response.BookLoanRequest
+import com.example.booktrackapplication.data.response.BorrowBooksResponse
 
 interface MainRepository {
 
@@ -18,5 +20,7 @@ interface MainRepository {
     suspend fun scanBookBarcode(code: String): Resource<BookResponse>
 
     suspend fun getSchedule(): Resource<EventsScheduleResponse>
+
+    suspend fun submitBorrowedBook(bookCodes: BookLoanRequest): Resource<BorrowBooksResponse>
 
 }

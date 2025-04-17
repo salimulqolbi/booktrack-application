@@ -23,6 +23,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +48,16 @@ import com.example.booktrackapplication.feature.home.HomeScreen
 import com.example.booktrackapplication.model.NavItems
 import com.example.booktrackapplication.ui.theme.ManropeFamily
 import com.example.booktrackapplication.utils.ScanWarningDialog
+import com.example.booktrackapplication.viewmodel.MainViewmodel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(navController: NavController) {
     val bottomNavController = rememberNavController()
 
     var showWarningDialog by remember { mutableStateOf(false) }
+
+    val viewModel: MainViewmodel = koinViewModel()
 
     Scaffold(
         floatingActionButton = {
@@ -96,9 +101,7 @@ fun MainScreen(navController: NavController) {
     if (showWarningDialog) {
         ScanWarningDialog(
             onDismissRequest = { showWarningDialog = false },
-            onNavigateToScan = {
-                navController.navigate("scan_code")
-            }
+            navController
         )
     }
 }
