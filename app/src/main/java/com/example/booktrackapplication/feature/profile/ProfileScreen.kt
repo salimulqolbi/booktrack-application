@@ -1,11 +1,14 @@
 package com.example.booktrack.feature.profile
 
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,11 +38,13 @@ import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,32 +61,46 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.booktrackapplication.R
+import com.example.booktrackapplication.utils.convertToRoman
+import com.example.booktrackapplication.utils.extractAbbreviation
+import com.example.booktrackapplication.viewmodel.MainViewmodel
 import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: RegistrationViewModel = koinViewModel()
+    viewModel: RegistrationViewModel = koinViewModel(),
+    mainModel: MainViewmodel = koinViewModel()
 ) {
 
-    val user by viewModel.user.collectAsStateWithLifecycle()
+    val user by mainModel.userUiState.collectAsStateWithLifecycle()
 
-    val name = user?.name ?: "Anonim"
-    val nis = user?.nis ?: "NIS tidak tersedia"
-    val kelas = user?.grade ?: "Kelas tidak diketahui"
-    val index = user?.classIndex ?: " "
-    val jurusan = user?.departmentId ?: " "
+    LaunchedEffect(Unit) {
+        mainModel.getUser()
+    }
+
+    val nama = user.user?.name ?: " Anonim"
+    val nis = user.user?.nis ?: "NIS tidak tersedia"
+    val kelas = user.user?.grade ?: "Kelas tidak diketahui"
+    val index = user.user?.classIndex ?: " "
+    val jurusan = user.user?.departmentId ?: " "
+
     val image = R.drawable.anonimus
 
     val context = LocalContext.current
 
-
-    val activity = LocalActivity.current
+    if (user.user == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
     val menuItems = listOf(
-        Icons.Outlined.CheckCircle to "Aktivasi Akun",
-        Icons.Outlined.Language to "Bahasa",
         Icons.Outlined.QuestionAnswer to "FAQ",
         Icons.Outlined.HeadsetMic to "Hubungi Kami",
         Icons.Outlined.Info to "Tentang Stemba Book Track"
@@ -139,14 +158,14 @@ fun ProfileScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "$name - $nis",
+                        text = "$nama",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$kelas - $jurusan $index",
+                        text = "$nis - ${convertToRoman(kelas.toString())} ${extractAbbreviation(jurusan)} $index",
                         fontSize = 12.sp,
                         color = Color.Black,
                         textAlign = TextAlign.Center
@@ -160,7 +179,7 @@ fun ProfileScreen(
                     colors = CardDefaults.cardColors(Color(0XFFF7F8FC)),
                     border = BorderStroke(1.dp, Color(0xffEBEBEB)),
                 ) {
-                    CardProfileMenuList(menuItems)
+                    CardProfileMenuList(menuItems, navController = navController)
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -214,60 +233,39 @@ fun TopAppBar() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, top = 40.dp, end = 20.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Card(
-            shape = CircleShape,
-            colors = CardDefaults.cardColors(Color.Transparent),
-//            border = BorderStroke(1.dp, Color(0xffEBEBEB)),
-            modifier = Modifier.size(44.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = null,
-                    tint = Color.Transparent,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-
         Text(
             text = "Profile",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
-
-        Card(
-            shape = CircleShape,
-            colors = CardDefaults.cardColors(Color(0XFFF7F8FC)),
-            border = BorderStroke(1.dp, Color(0xffEBEBEB)),
-            modifier = Modifier.size(44.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.notification),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
     }
 }
 
 @Composable
-fun CardProfileMenu(icon: ImageVector, title: String) {
+fun CardProfileMenu(
+    icon: ImageVector,
+    title: String,
+    onClick: (() -> Unit)? = null
+) {
+
+    val modifier = if (onClick != null) {
+        Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(bottom = 12.dp)
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
+    }
+
     Column {
         Row(
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -288,7 +286,12 @@ fun CardProfileMenu(icon: ImageVector, title: String) {
 }
 
 @Composable
-fun CardProfileMenuList(menuItems: List<Pair<ImageVector, String>>) {
+fun CardProfileMenuList(
+    menuItems: List<Pair<ImageVector, String>>,
+    navController: NavController
+) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -296,7 +299,39 @@ fun CardProfileMenuList(menuItems: List<Pair<ImageVector, String>>) {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         menuItems.forEach { (icon, title) ->
-            CardProfileMenu(icon = icon, title = title)
+            val onClick: (() -> Unit)? = when (title) {
+
+                "FAQ" -> {
+                    {
+                        navController.navigate("faq") {
+                            popUpTo("profile") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+
+                "Hubungi Kami" -> {
+                    {
+                        val url = "https://wa.me/628813718712"
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        context.startActivity(intent)
+                    }
+                }
+
+                "Tentang Stemba Book Track" -> {
+                    {
+                        navController.navigate("about_us") {
+                            popUpTo("profile") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+
+                else -> null
+            }
+            CardProfileMenu(icon = icon, title = title, onClick = onClick)
         }
     }
 }
