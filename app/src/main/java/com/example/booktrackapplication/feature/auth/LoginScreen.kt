@@ -4,17 +4,22 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -30,8 +35,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -39,6 +47,7 @@ import com.example.booktrack.utils.PasswordTextField
 import com.example.booktrack.utils.ProfileNumberField
 import com.example.booktrackapplication.R
 import com.example.booktrackapplication.ui.theme.ManropeFamily
+import com.example.booktrackapplication.utils.LoginWarning
 import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,20 +71,23 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
                     .background(Color.White)
+                    .padding(top = 22.dp)
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     modifier = Modifier
-                        .height(104.dp)
+                        .height(112.dp)
                         .fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.biblioo_logo),
-                        contentDescription = "Biblioo",
+                        contentDescription = "Book Track",
                         tint = Color(0xFF2846CF)
                     )
 
@@ -118,9 +130,11 @@ fun LoginScreen(
                     modifier = Modifier
                         .padding(start = 24.dp, end = 24.dp)
                 ) {
+
+                    //NIS
                     Column(
                         horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+//                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.nomor_identitas),
@@ -130,6 +144,8 @@ fun LoginScreen(
                             fontWeight = FontWeight.Medium,
                         )
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         ProfileNumberField(
                             value = state.nis,
                             placeholder = stringResource(R.string.masukan_nomor_identitas),
@@ -138,15 +154,18 @@ fun LoginScreen(
                                 .clip(RoundedCornerShape(8.dp)),
                             onValueChange = {
                                 viewModel.onNisLoginChange(it)
-                            }
+                            },
+                            isError = state.nisError != null,
+                            errorMessage = state.nisError,
                         )
                     }
 
+                    //PASSWORD
                     Column(
                         modifier = Modifier
                             .padding(top = 16.dp),
                         horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+//                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.kata_sandi),
@@ -155,6 +174,9 @@ fun LoginScreen(
                             fontFamily = ManropeFamily,
                             fontWeight = FontWeight.Medium,
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
 
                         PasswordTextField(
                             labelValue = stringResource(R.string.masukan_kata_sandi),
@@ -165,52 +187,10 @@ fun LoginScreen(
                                 .clip(RoundedCornerShape(8.dp)),
                             onValueChange = {
                                 viewModel.onPasswordChange(it)
-                            }
+                            },
+                            isError = state.passError != null,
+                            errorMessage = state.passError,
                         )
-
-                        Row(
-                            modifier = Modifier
-//                                .padding(top = 8.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Checkbox(
-                                    onCheckedChange = { },
-                                    modifier = Modifier
-                                        .scale(0.8f)
-                                        .size(20.dp),
-                                    checked = false,
-                                )
-
-                                Text(
-                                    text = stringResource(R.string.ingat_saya),
-                                    fontSize = 10.sp,
-                                    color = Color(0xff1E1E1E),
-                                    fontFamily = ManropeFamily,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-
-                            Text(
-                                text = stringResource(R.string.lupa),
-                                fontSize = 10.sp,
-                                color = Color(0xff1E1E1E),
-                                fontFamily = ManropeFamily,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.clickable {
-                                    navController.navigate("register") {
-                                        popUpTo("login") {
-                                            inclusive = true
-                                        }
-                                    }
-                                }
-                            )
-                        }
                     }
                 }
 
@@ -242,7 +222,7 @@ fun LoginScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2846CF))
                 ) {
                     Text(
-                        text = stringResource(R.string.aktivasi_akun),
+                        text = stringResource(R.string.masuk),
                         fontSize = 12.sp,
                         color = Color(0xffFFFFFF),
                         fontFamily = ManropeFamily,
@@ -250,6 +230,48 @@ fun LoginScreen(
                     )
                 }
             }
+        },
+        bottomBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 60.dp, end = 60.dp, bottom = 80.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                ActivationText {
+                    navController.navigate("register") {
+//                        popUpTo("login") {
+//                            inclusive = true
+//                        }
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun ActivationText(onActivateClick: () -> Unit) {
+    val annotatedText = buildAnnotatedString {
+        withStyle(style = SpanStyle(color = Color(0xff111111).copy(alpha = 0.4f), fontSize = 14.sp)) {
+            append("Belum aktivasi akun? ")
+        }
+
+        pushStringAnnotation(tag = "ACTIVATE", annotation = "activate")
+        withStyle(style = SpanStyle(color = Color(0xff111111), fontWeight = FontWeight.Bold, fontSize = 14.sp)) {
+            append("Aktivasi")
+        }
+        pop()
+    }
+
+    ClickableText(
+        text = annotatedText,
+        onClick = { offset ->
+            annotatedText.getStringAnnotations(tag = "ACTIVATE", start = offset, end = offset)
+                .firstOrNull()?.let {
+                    onActivateClick()
+                }
         }
     )
 }

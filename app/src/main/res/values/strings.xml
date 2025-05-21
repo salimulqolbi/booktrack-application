@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BookTrackApplication</string>
+    <string name="app_name">Book Track</string>
 
     //LOGIN
     <string name="selamat_datang">Selamat Datang</string>
@@ -55,8 +55,15 @@
     <string name="detail">Detail</string>
 
     //PEMINJAMAN BUKU
-    <string name="submit_buku">Submit Peminjaman Buku</string>
+    <string name="submit">Submit Peminjaman Buku</string>
+    <string name="submit_buku">Submit Pengembalian Buku</string>
     <string name="lanjut">Lanjut Scan Buku</string>
     <string name="kepada">Kepada seluruh siswa - siswi SMKN 7 Semarang yang akan melakukan pemindaian buku diharapkan untuk mencermati berikut:  </string>
+
+    //TENTANG KAMI
+    <string name="tentang_kami">Tentang Kami</string>
+    <string name="paragraf_1">Book Track adalah platform yang memudahkan siswa dalam meminjam dan mengembalikan buku, yang dibuat oleh siswa untuk tugas akhir sekolah. Dengan sistem digital yang cepat dan efisien, siswa dapat mencari referensi dengan mudah dan terorganisir.</string>
+    <string name="paragraf_2">Aplikasi ini menyediakan fitur pencarian buku, notifikasi pengembalian, serta riwayat peminjaman untuk memastikan pengalaman belajar yang lebih baik. Terintegrasi dengan perpustakaan sekolah, kami membantu siswa mengakses sumber referensi dengan lebih praktis.</string>
+    <string name="paragraf_3">Nikmati kemudahan bersama Book Track dan tingkatkan kualitas tugas akhir Anda dengan akses buku yang lebih luas! Jika Anda mengalami kendala atau memiliki pertanyaan, jangan ragu untuk menghubungi tim support kami untuk bantuan lebih lanjut.</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package com.example.booktrack.feature.login
 
 import android.os.Build
+import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,10 +11,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -47,12 +51,18 @@ fun RegistrationScreen(
 ) {
     val state = viewModel.registrationUiState
 
+    BackHandler {
+        navController.popBackStack()
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .imePadding()
                     .background(Color.White)
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -67,7 +77,7 @@ fun RegistrationScreen(
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.biblioo_logo),
-                        contentDescription = null,
+                        contentDescription = "Book Track",
                         tint = Color(0xFF2846CF)
                     )
 
@@ -88,6 +98,7 @@ fun RegistrationScreen(
                 ) {
                     Text(
                         text = stringResource(id = R.string.aktivasi),
+                        color = Color(0xFF1E1E1E),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = ManropeFamily
@@ -132,7 +143,11 @@ fun RegistrationScreen(
                                 .clip(RoundedCornerShape(8.dp)),
                             onValueChange = {
                                 viewModel.onNisChange(it)
-                            }
+                            },
+//                            isError = state.isError,
+//                            errorMessage = state.errorMessage
+                            isError = state.nisError != null,
+                            errorMessage = state.nisError
                         )
                     }
 
@@ -164,6 +179,8 @@ fun RegistrationScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+
+                    //PASSWORD AKTIVASI
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -185,12 +202,18 @@ fun RegistrationScreen(
                                 .clip(RoundedCornerShape(8.dp)),
                             onValueChange = {
                                 viewModel.onOldPasswordChange(it)
-                            }
+                            },
+//                            isError = state.isError,
+//                            errorMessage = "Password aktivasi tidak cocok."
+                            isError = state.passwordError != null,
+                            errorMessage = state.passwordError
                         )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+
+                    //NEW PASSWORD
                     Column(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -242,20 +265,13 @@ fun RegistrationScreen(
                         CircularProgressIndicator(color = Color.White)
                     } else {
                         Text(
-                            text = stringResource(R.string.masuk),
+                            text = stringResource(R.string.aktivasi),
                             fontSize = 12.sp,
                             color = Color(0xffFFFFFF),
                             fontFamily = ManropeFamily,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
-                }
-                if (state.isError) {
-                    Text(
-                        text = state.errorMessage ?: "Terjadi kesalahan",
-                        color = Color.Red,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
                 }
                 if (state.isSuccess) {
                     Text(

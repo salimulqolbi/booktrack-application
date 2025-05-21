@@ -8,3 +8,6 @@ data class LoginResponse(
     val token: String,
     val user: UserResponse
 )
+
+@Serializable
+data class ErrorLoginResponse(val message: String)
