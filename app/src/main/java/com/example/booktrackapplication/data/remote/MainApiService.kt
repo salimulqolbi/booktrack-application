@@ -5,9 +5,17 @@ import com.example.booktrack.data.response.BookResponse
 import com.example.booktrack.data.response.BorrowStatusResponse
 import com.example.booktrack.data.response.CurriculumResponse
 import com.example.booktrack.data.response.EventsScheduleResponse
+import com.example.booktrack.data.response.UserResponse
 import com.example.booktrack.data.response.ValidateBorrowingDateResponse
+import com.example.booktrackapplication.data.response.ActivityResponse
 import com.example.booktrackapplication.data.response.BookLoanRequest
+import com.example.booktrackapplication.data.response.BookReturnRequest
 import com.example.booktrackapplication.data.response.BorrowBooksResponse
+import com.example.booktrackapplication.data.response.GetUserResponse
+import com.example.booktrackapplication.data.response.HistoryResponse
+import com.example.booktrackapplication.data.response.ProfileResponse
+import com.example.booktrackapplication.data.response.ReturnBooksResponse
+import com.example.booktrackapplication.data.response.ValidateReturningDateResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -158,6 +166,117 @@ class MainApiService (
                 Json.decodeFromString<BorrowBooksResponse>(errorBody)
             } catch (e: Exception) {
                 Log.e("LoanApi", "submitLoan error: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    suspend fun getActivity(token: String): ActivityResponse {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: HttpResponse = client.get {
+                    url("$baseUrl/books/current")
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                }
+
+                val body = response.bodyAsText()
+                Log.d("ActivityApi", "getActivity: $body")
+                response.body()
+            } catch (e: Exception) {
+                Log.e("ActivityApi", "Error getActivity: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    suspend fun getHistory(token: String): HistoryResponse {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: HttpResponse = client.get {
+                    url("$baseUrl/books/history")
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                }
+
+                val body = response.bodyAsText()
+                Log.d("HistoryApi", "getHistory: $body")
+                response.body()
+            } catch (e: Exception) {
+                Log.e("HistoryApi", "Error getHistory: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    suspend fun validateReturningDate(token: String): ValidateReturningDateResponse {
+        return withContext(Dispatchers.IO) {
+            try{
+                val response: HttpResponse = client.get {
+                    url("$baseUrl/events/validate-returning-date")
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                }
+
+                val body = response.bodyAsText()
+                Log.d("BorrowApi", "validateReturningDate: $body")
+                response.body()
+            } catch (e: Exception) {
+                Log.e("ReturnApi", "Error validateReturningDate: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    suspend fun submitReturnedBook(bookCodes: BookReturnRequest, token: String): ReturnBooksResponse {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response: HttpResponse = client.post{
+                    url("$baseUrl/return-books")
+                    headers {
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                    setBody(bookCodes)
+                }
+
+                val body = response.bodyAsText()
+                Log.d("return", "returnBook: $body")
+                response.body()
+            } catch (e: ClientRequestException) {
+                val errorBody = e.response.bodyAsText()
+                Log.e("return", "returnBook (client error): $errorBody")
+                // biar error detail bisa diproses di repo / VM
+                Json.decodeFromString<ReturnBooksResponse>(errorBody)
+            } catch (e: Exception) {
+                Log.e("return", "returnBook error: ${e.message}")
+                throw e
+            }
+        }
+    }
+
+    suspend fun getUser(token: String): GetUserResponse {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response : HttpResponse = client.get {
+                    url("$baseUrl/user")
+                    headers{
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                }
+
+                val body = response.bodyAsText()
+                Log.d("UserApi", "getUser: $body")
+                response.body()
+            } catch (e: Exception) {
+                Log.e("UserApi", "Error getUser: ${e.message}")
                 throw e
             }
         }

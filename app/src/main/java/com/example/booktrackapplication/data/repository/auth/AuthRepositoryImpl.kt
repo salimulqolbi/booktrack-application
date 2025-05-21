@@ -10,6 +10,7 @@ import com.example.booktrackapplication.data.datastore.DataStoreManager
 import com.example.booktrackapplication.data.remote.AuthApiService
 import com.example.booktrackapplication.data.request.ActiveAccRequest
 import com.example.booktrackapplication.data.request.LoginRequest
+import com.example.booktrackapplication.data.response.GetUserResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.put
@@ -30,7 +31,7 @@ class AuthRepositoryImpl (
             val response = apiService.activeAccount(request)
             Resource.Success(response)
         } catch (e: Exception) {
-            Resource.Error("Gagal aktivasi: ${e.message}")
+            Resource.Error("${e.message}")
         }
     }
 
@@ -40,7 +41,7 @@ class AuthRepositoryImpl (
             dataStoreManager.saveToken(response.token)
             Resource.Success(response)
         } catch (e: Exception) {
-            Resource.Error("Gagal login: ${e.message}")
+            Resource.Error("${e.message}")
         }
     }
 
@@ -59,12 +60,13 @@ class AuthRepositoryImpl (
         }
     }
 
-//    override suspend fun getUser(token: String): Resource<UserResponse> {
-//        return try {
-//            val response = apiService.getUser(token)
-//            Resource.Success(response)
-//        } catch (e: Exception) {
-//            Resource.Error("Gagal mengambil data user: ${e.message}")
-//        }
-//    }
+    override suspend fun getUser(): Resource<GetUserResponse> {
+        return try{
+            val token = dataStoreManager.getToken() ?: return Resource.Error("Token not found")
+            val result = apiService.getUser(token)
+            Resource.Success(result)
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "Gagal mendapatkan data user")
+        }
+    }
 }

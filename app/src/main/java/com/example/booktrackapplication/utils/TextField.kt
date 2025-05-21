@@ -1,6 +1,7 @@
 package com.example.booktrack.utils
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -44,14 +45,23 @@ fun ProfileNumberField(
     placeholder: String,
     modifier: Modifier,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    isError: Boolean = false,
+    errorMessage: String? = null
 ) {
 //    val textValue = rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = modifier
             .height(40.dp)
-            .background(Color(0xffF7F8FC), shape = RoundedCornerShape(8.dp))
+            .background(
+                color = if (isError) Color(0x0DCC5252) else Color(0xffF7F8FC),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .then(
+                if(isError) Modifier.border(1.dp, Color(0xffCC5252), shape = RoundedCornerShape(8.dp))
+                else Modifier
+            )
             .padding(start = 12.dp)
         // Padding agar tampilan lebih rapi
     ) {
@@ -101,22 +111,41 @@ fun ProfileNumberField(
             )
         }
     }
+
+    if (isError && !errorMessage.isNullOrEmpty()) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = errorMessage,
+            fontSize = 10.sp,
+            fontFamily = ManropeFamily,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFFCC5252)
+        )
+    }
 }
 
 @Composable
 fun NumberTextField(
     placeholder: String,
     modifier: Modifier,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    isError: Boolean = false,
+    errorMessage: String? = null
 ) {
     val textValue = rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = modifier
             .height(40.dp)
-            .background(Color(0xffF7F8FC), shape = RoundedCornerShape(8.dp))
+            .background(
+                color = if (isError) Color(0x0DCC5252) else Color(0xffF7F8FC),
+                shape = RoundedCornerShape(8.dp)
+            )
+            .then(
+                if(isError) Modifier.border(1.dp, Color(0xffCC5252), shape = RoundedCornerShape(8.dp))
+                else Modifier
+            )
             .padding(start = 12.dp)
-        // Padding agar tampilan lebih rapi
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -165,6 +194,17 @@ fun NumberTextField(
             )
         }
     }
+
+    if (isError && !errorMessage.isNullOrEmpty()) {
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = errorMessage,
+            fontSize = 10.sp,
+            fontFamily = ManropeFamily,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFFCC5252)
+        )
+    }
 }
 
 @Composable
@@ -186,17 +226,6 @@ fun PhoneNumberTextField(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            // Bagian "+62" yang tidak bisa diubah
-            Text(
-                text = "+62",
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Normal,
-                fontFamily = ManropeFamily,
-                color = Color(0xff888997)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp)) // Jarak antara +62 dan input
-
             // BasicTextField sebagai input nomor
             BasicTextField(
                 value = textValue.value,
@@ -224,7 +253,7 @@ fun PhoneNumberTextField(
                     ) {
                         if (textValue.value.isEmpty()) {
                             Text(
-                                text = "81xxxxxxxxx",
+                                text = "08xxxxxxxxxx",
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Normal,
                                 fontFamily = ManropeFamily,
@@ -246,7 +275,9 @@ fun PhoneNumberTextField(
         labelValue: String,
         modifier: Modifier = Modifier,
         leadingIcon: @Composable (() -> Unit)? = null,
-        onValueChange: (String) -> Unit
+        onValueChange: (String) -> Unit,
+        isError: Boolean = false,
+        errorMessage: String? = null
     ) {
         val localFocusManager = LocalFocusManager.current
         val password = rememberSaveable { mutableStateOf("") }
@@ -255,7 +286,6 @@ fun PhoneNumberTextField(
         BasicTextField(
             value = value,
             onValueChange = {
-//                password.value = it
                 onValueChange(it)
             },
             singleLine = true,
@@ -268,7 +298,15 @@ fun PhoneNumberTextField(
                 localFocusManager.clearFocus()
             },
             modifier = modifier
-                .background(Color(0xffF7F8FC), RoundedCornerShape(8.dp))
+                .background(
+                    if(isError) Color(0x0DCC5252) else Color(0xffF7F8FC),
+                    RoundedCornerShape(8.dp)
+                )
+                .border(
+                    width = 1.dp,
+                    color = if (isError) Color(0xFFCC5252) else Color.Transparent,
+                    shape = RoundedCornerShape(8.dp)
+                )
                 .padding(horizontal = 12.dp, vertical = 8.dp)
                 .fillMaxWidth(),
             decorationBox = { innerTextField ->
@@ -304,4 +342,15 @@ fun PhoneNumberTextField(
                 }
             }
         )
+
+        if (isError && !errorMessage.isNullOrEmpty()) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = errorMessage,
+                fontSize = 10.sp,
+                fontFamily = ManropeFamily,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFFCC5252)
+            )
+        }
     }

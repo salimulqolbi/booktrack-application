@@ -29,7 +29,7 @@ import org.koin.dsl.module
 
 val appModule = module {
 
-    single { "http://103.196.153.74:8000/api" }
+    single { "http://116.254.117.235:8000/apix" }
 
     single {
         HttpClient {

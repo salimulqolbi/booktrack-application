@@ -1,16 +1,15 @@
-package com.example.booktrack.data.response
+package com.example.booktrackapplication.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ActiveAccResponse(
-    val message: String,
-    val user: ActiveUserResponse
+data class GetUserResponse(
+    val data: ProfileResponse
 )
 
 @Serializable
-data class ActiveUserResponse(
+data class ProfileResponse(
     val id: Int,
     val name: String,
     val nis: String,
@@ -24,8 +23,3 @@ data class ActiveUserResponse(
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String
 )
-
-@Serializable
-data class ErrorResponse(val message: String)
-
-

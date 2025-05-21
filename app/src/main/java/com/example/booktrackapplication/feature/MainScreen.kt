@@ -65,7 +65,7 @@ fun MainScreen(navController: NavController) {
                 onClick = { showWarningDialog = true },
                 backgroundColor = Color.Black,
                 contentColor = Color.White,
-                shape = CircleShape
+//                shape = CircleShape
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_scan_qr),
@@ -89,7 +89,7 @@ fun MainScreen(navController: NavController) {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { HomeScreen(navController) }
+            composable("home") { HomeScreen(navController, mainViewmodel = viewModel) }
             composable("activity") { ActivityScreen() }
             composable("history") { HistoryScreen() }
             composable("profile") {
@@ -114,7 +114,7 @@ fun BottomNavigationBar(bottomNavController: NavController) {
     val rightItems = listOf(NavItems.History, NavItems.Profile)
 
     BottomAppBar(
-        cutoutShape = CircleShape,
+//        cutoutShape = CircleShape,
         backgroundColor = Color.White,
         modifier = Modifier
             .padding(

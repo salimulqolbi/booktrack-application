@@ -1,16 +1,16 @@
-package com.example.booktrack.data.response
+package com.example.booktrackapplication.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-class BookResponse(
+data class ActivityResponse(
     val message: String,
-    val data: BookData
+    val data: List<ActivityItem>
 )
 
 @Serializable
-data class BookData(
+data class ActivityItem(
     val id: Int,
     val title: String,
     @SerialName("book_type") val bookType: String,
@@ -20,17 +20,17 @@ data class BookData(
     val code: String,
     @SerialName("cover_path") val coverPath: String,
     @SerialName("cover_url") val coverUrl: String,
-    @SerialName("borrowed_by") val borrowedBy: BorrowerInfo? = null,
+    @SerialName("borrowed_by") val borrowedBy: BorrowedItem,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String
 )
 
 @Serializable
-data class BorrowerInfo(
+data class BorrowedItem(
     val id: Int,
     val name: String,
     val grade: Int,
     val department: String,
-    @SerialName("class_index") val classIndex: Int,
+    @SerialName("class_index")val classIndex: Int,
     @SerialName("phone_number") val phoneNumber: String
 )

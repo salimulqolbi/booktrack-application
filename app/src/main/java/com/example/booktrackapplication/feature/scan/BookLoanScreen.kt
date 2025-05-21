@@ -177,7 +177,7 @@ fun BookLoanScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = if(isComplete) stringResource(R.string.submit_buku) else stringResource(id = R.string.lanjut),
+                            text = if(isComplete) stringResource(R.string.submit) else stringResource(id = R.string.lanjut),
                             fontSize = 12.sp,
                             color = Color(0xffFFFFFF),
                             fontFamily = ManropeFamily,
@@ -235,8 +235,8 @@ fun BookLoanScreen(
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.clearSuccessFlag()
-                    navController.navigate("home") {
-                        popUpTo("book_loan") { inclusive = true }
+                    navController.navigate("main") {
+                        popUpTo("list") { inclusive = true }
                     }
                 }) {
                     Text("OK")
@@ -302,7 +302,8 @@ fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
                 text = book.title,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.SemiBold,
-                fontFamily = ManropeFamily
+                fontFamily = ManropeFamily,
+                color = Color.Black
             )
 
             Card(

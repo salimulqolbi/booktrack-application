@@ -1,0 +1,64 @@
+LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+//            navController.navigate("scan_code")
+            navController.navigate("scan_code/${scanMode.name.lowercase()}")
+            viewModel.clearSuccessFlag()
+        }
+    }
+
+
+
+composable(
+            "scan_code/{mode}",
+            arguments = listOf(navArgument("mode") { type = NavType.StringType })
+        ) { backStackEntry ->
+
+            val mode = backStackEntry.arguments?.getString("mode") ?: "BORROW"
+            val scanMode = ScanMode.valueOf(mode)
+
+//            val viewModel = koinViewModel<MainViewmodel>()
+            ScanScreen(
+                navController = navController,
+                scanMode = scanMode,
+                viewModel = viewModel,
+                onBarcodeScanned = { barcode ->
+                    viewModel.fetchBook(barcode)
+                }
+            )
+        }
+        composable("list/{mode}") { backStackEntry ->
+            val mode = backStackEntry.arguments?.getString("mode")?.uppercase() ?: "BORROW"
+            val scanMode = try {
+                ScanMode.valueOf(mode)
+            } catch (e: IllegalArgumentException) {
+                ScanMode.BORROW // Default ke peminjaman
+            }
+            BookLoanScreen(
+                navController,
+                scanMode = scanMode,
+                viewModel = viewModel
+            )
+        }
+
+LaunchedEffect(Unit) {
+        if (!isValidationStarted.value) {
+            isValidationStarted.value = true
+            when(scanMode) {
+                ScanMode.BORROW -> viewModel.checkBorrowStatusValidation()
+                ScanMode.RETURN -> viewModel.validateRetuningDate()
+            }
+        }
+    }
+
+if (scannedBook != null) {
+        ConfirmBookDialog(
+            book = scannedBook,
+            onDismiss = { viewModel.reset() },
+            onConfirm = {
+                viewModel.addBook(scannedBook)
+                viewModel.reset()
+                navController.navigate("list/${scanMode.name.lowercase()}")
+            }
+        )
+    }
+

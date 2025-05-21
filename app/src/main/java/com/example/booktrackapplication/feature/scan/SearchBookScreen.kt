@@ -1,8 +1,7 @@
-package com.example.booktrack.feature.home
+package com.example.booktrackapplication.feature.scan
 
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +25,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.booktrackapplication.R
@@ -49,18 +53,17 @@ import com.example.booktrackapplication.viewmodel.MainViewmodel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun DetailBookScreen(
+fun SearchBookScreen(
     navController: NavController,
     viewmodel: MainViewmodel = koinViewModel()
 ) {
+//    val book by viewmodel.searchBook.collectAsState()
 
     val book = viewmodel.scannedBook
 
-//    val scannedBook by viewmodel.scannedBook
     LaunchedEffect(book) {
-        Log.d("BOOK_DEBUG", "Scanned Book value: $book")
+        Log.d("BOOK_DEBUG", "Search Book value: $book")
     }
-
 
     Scaffold(
         modifier = Modifier.fillMaxSize().padding(top = 24.dp),
@@ -114,23 +117,23 @@ fun DetailBookScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         AsyncImage(
-                            model = book.coverUrl,
-                            contentDescription = book.title,
+                            model = book!!.coverUrl,
+                            contentDescription = book!!.title,
                             modifier = Modifier
                                 .width(100.dp)
                                 .height(144.dp)
                                 .padding(bottom = 12.dp),
                         )
-                    Log.d("book", "${book}")
+                        Log.d("book", "${book}")
                         Text(
-                            text = book.title,
+                            text = book!!.title,
                             fontFamily = ManropeFamily,
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
                             color = Color.Black,
                         )
                         Text(
-                            text = "Kelas ${book.grade}",
+                            text = "Kelas ${book!!.grade}",
                             fontFamily = ManropeFamily,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
@@ -173,7 +176,7 @@ fun DetailBookScreen(
                                     modifier = Modifier
                                 ) {
                                     Text(
-                                        book.code,
+                                        book!!.code,
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp),
                                         fontSize = 10.sp,
@@ -211,7 +214,7 @@ fun DetailBookScreen(
                                     modifier = Modifier
                                 ) {
                                     Text(
-                                        book.bookType,
+                                        book!!.bookType,
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp),
                                         fontSize = 10.sp,
@@ -249,7 +252,7 @@ fun DetailBookScreen(
                                     modifier = Modifier
                                 ) {
                                     Text(
-                                        "Semester ${book.semesters.replace(",", " & ")}",
+                                        "Semester ${book!!.semesters.replace(",", " & ")}",
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp),
                                         fontSize = 10.sp,
@@ -320,23 +323,15 @@ fun DetailBookScreen(
                                                     .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
                                                 contentAlignment = Alignment.Center
                                             ) {
-//                                                book.borrowedBy?.let { it1 ->
-//                                                    Text(
-//                                                        text = it1.name ?: "-",
-//                                                        fontSize = 10.sp,
-//                                                        fontFamily = ManropeFamily,
-//                                                        fontWeight = FontWeight.SemiBold,
-//                                                        color = Color(0xff333333)
-//                                                    )
-//                                                }
-                                                Text(
-                                                    text = book.borrowedBy?.name ?: "-",
-                                                    fontSize = 10.sp,
-                                                    fontFamily = ManropeFamily,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = Color(0xff333333)
-                                                )
-
+                                                book!!.borrowedBy?.let { it1 ->
+                                                    Text(
+                                                        text = it1.name,
+                                                        fontSize = 10.sp,
+                                                        fontFamily = ManropeFamily,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = Color(0xff333333)
+                                                    )
+                                                }
                                             }
                                         }
 
@@ -380,18 +375,13 @@ fun DetailBookScreen(
                                                 )
                                             }
                                             // Column 2
-
-                                            val borrowerInfo = if (book.borrowedBy?.classIndex != null) {
-                                                "${convertToRoman(book.grade)} ${extractAbbreviation(book.department)} ${book.borrowedBy.classIndex}"
-                                            } else {
-                                                "-"
-                                            }
                                             Box(
                                                 modifier = Modifier,
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
-                                                    text = borrowerInfo,
+                                                    text = "${convertToRoman(book!!.grade)} ${extractAbbreviation(
+                                                        book!!.department)} ${book!!.borrowedBy?.classIndex} ",
                                                     fontSize = 10.sp,
                                                     fontFamily = ManropeFamily,
                                                     modifier = Modifier.padding(
@@ -447,33 +437,20 @@ fun DetailBookScreen(
                                                 modifier = Modifier,
                                                 contentAlignment = Alignment.Center
                                             ) {
-//                                                book.borrowedBy?.let { it1 ->
-//                                                    Text(
-//                                                        text = it1.phoneNumber ?: "-",
-//                                                        fontSize = 10.sp,
-//                                                        modifier = Modifier.padding(
-//                                                            start = 12.dp,
-//                                                            top = 4.dp,
-//                                                            bottom = 4.dp
-//                                                        ),
-//                                                        fontFamily = ManropeFamily,
-//                                                        fontWeight = FontWeight.SemiBold,
-//                                                        color = Color(0xff333333)
-//                                                    )
-//                                                }
-
-                                                Text(
-                                                    text = book?.borrowedBy?.phoneNumber ?: "-",
-                                                    fontSize = 10.sp,
-                                                    modifier = Modifier.padding(
-                                                        start = 12.dp,
-                                                        top = 4.dp,
-                                                        bottom = 4.dp
-                                                    ),
-                                                    fontFamily = ManropeFamily,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = Color(0xff333333)
-                                                )
+                                                book!!.borrowedBy?.let { it1 ->
+                                                    Text(
+                                                        text = it1.phoneNumber,
+                                                        fontSize = 10.sp,
+                                                        modifier = Modifier.padding(
+                                                            start = 12.dp,
+                                                            top = 4.dp,
+                                                            bottom = 4.dp
+                                                        ),
+                                                        fontFamily = ManropeFamily,
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = Color(0xff333333)
+                                                    )
+                                                }
                                             }
                                         }
                                     }

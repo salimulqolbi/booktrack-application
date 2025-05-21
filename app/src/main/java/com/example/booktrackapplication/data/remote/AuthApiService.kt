@@ -2,11 +2,15 @@ package com.example.booktrackapplication.data.remote
 
 import android.util.Log
 import com.example.booktrack.data.response.ActiveAccResponse
+import com.example.booktrack.data.response.ErrorLoginResponse
+import com.example.booktrack.data.response.ErrorResponse
 import com.example.booktrack.data.response.LoginResponse
 import com.example.booktrackapplication.data.request.ActiveAccRequest
 import com.example.booktrackapplication.data.request.LoginRequest
+import com.example.booktrackapplication.data.response.GetUserResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.headers
 import io.ktor.client.request.post
@@ -21,6 +25,7 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 class AuthApiService(
     private val client: HttpClient,
@@ -39,10 +44,16 @@ class AuthApiService(
                 val responseBody = response.bodyAsText()
                 Log.d("book", "Response Body: $responseBody")
 
-                response.body() // Parsing ke ActiveAccResponse
+                if(!response.status.isSuccess()) {
+                    val errorJson = Json.decodeFromString<ErrorResponse>(responseBody)
+                    throw Exception(errorJson.message)
+                }
+
+//                response.body() // Parsing ke ActiveAccResponse
+                Json.decodeFromString(responseBody)
             } catch (e: Exception) {
                 Log.e("book", "Failed to activate account: ${e.message}")
-                throw Exception("Failed to activate account: ${e.message}")
+                throw Exception("${e.message}")
             }
         }
     }
@@ -61,10 +72,16 @@ class AuthApiService(
                 val responseBody = response.bodyAsText()
                 Log.d("book", "Response Body: $responseBody")
 
-                response.body()
+                if(!response.status.isSuccess()) {
+                    val errorJson = Json.decodeFromString<ErrorLoginResponse>(responseBody)
+                    throw Exception(errorJson.message)
+                }
+
+//                response.body() // Parsing ke ActiveAccResponse
+                Json.decodeFromString(responseBody)
             } catch (e: Exception) {
                 Log.e("book", "Failed to login: ${e.message}")
-                throw Exception("Failed to login: ${e.message}")
+                throw Exception("${e.message}")
             }
         }
     }
@@ -92,6 +109,27 @@ class AuthApiService(
             } catch (e: Exception) {
                 Log.e("book", "Failed to logout: ${e.message}")
                 throw Exception("Failed to logout: ${e.message}")
+            }
+        }
+    }
+
+    suspend fun getUser(token: String): GetUserResponse {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response : HttpResponse = client.get {
+                    url("$baseUrl/user")
+                    headers{
+                        append(HttpHeaders.Authorization, "Bearer $token")
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                }
+
+                val body = response.bodyAsText()
+                Log.d("UserApi", "getUser: $body")
+                response.body()
+            } catch (e: Exception) {
+                Log.e("UserApi", "Error getUser: ${e.message}")
+                throw e
             }
         }
     }

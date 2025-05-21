@@ -34,6 +34,12 @@ class DataStoreManager(private val dataStore: DataStore<Preferences>) {
         }
     }
 
+    suspend fun clearAll() {
+        dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
+
     suspend fun saveUser(user: UserResponse) {
         val json = Gson().toJson(user)
         dataStore.edit { preferences ->

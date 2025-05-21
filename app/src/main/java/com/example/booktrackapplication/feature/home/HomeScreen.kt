@@ -25,8 +25,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -42,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,24 +68,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.booktrack.utils.HomeCard
 import com.example.booktrack.utils.HomeProfileImage
 import com.example.booktrack.utils.NewsList
 import com.example.booktrack.utils.SearchBar2
 import com.example.booktrackapplication.R
 import com.example.booktrackapplication.data.NewsData
 import com.example.booktrackapplication.ui.theme.ManropeFamily
+import com.example.booktrackapplication.utils.LoanWarningDialog
+import com.example.booktrackapplication.utils.ScanBookCard
 import com.example.booktrackapplication.viewmodel.MainViewmodel
 import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 //import org.koin.androidx.compose.get
-
-//val searchHistory = listOf(
-//    "BA - 7862 - SD76",
-//    "CY - 9711 - BH73",
-//    "MK - 1788 - 2222"
-//)
 
 @Composable
 fun HomeScreen(
@@ -91,6 +92,10 @@ fun HomeScreen(
     mainViewmodel: MainViewmodel = koinViewModel()
 ) {
     val user by viewModel.user.collectAsState()
+
+    var showWarningDialog by remember { mutableStateOf(false) }
+
+    val foundBook by mainViewmodel.searchBook.collectAsStateWithLifecycle()
 
     val isLoading = user == null
 
@@ -106,6 +111,8 @@ fun HomeScreen(
     val focusManager = LocalFocusManager.current
 
     val scannedBook = mainViewmodel.scannedBook
+
+    val searchedBook = mainViewmodel.searchedBook
 
     BackHandler(enabled = isSearchActive) {
         isSearchActive = false
@@ -127,23 +134,15 @@ fun HomeScreen(
         mainViewmodel.reset()
     }
 
-
-
-//    LaunchedEffect(scannedBook) {
-//        scannedBook?.let {
-//            navController.navigate("bookDetail") {
-//                launchSingleTop = true
-//            }
-//        }
-//    }
-
     var searchText by rememberSaveable { mutableStateOf("") }
 
+    LaunchedEffect(scannedBook) {
+        if (scannedBook != null) {
+            navController.navigate("detail_book")
+        }
+    }
+
     val state by mainViewmodel.uiState.collectAsState()
-
-    var shouldNavigateToSchedule by rememberSaveable { mutableStateOf(false) }
-
-    val schedules = state.schedules
 
 //    val history = mainViewmodel.searchHistory
 
@@ -159,6 +158,7 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(WindowInsets.statusBars.asPaddingValues())
+                .verticalScroll(rememberScrollState())
                 .animateContentSize()
         ) {
 
@@ -168,7 +168,8 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 20.dp, end = 20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(
                         modifier = Modifier
@@ -195,304 +196,51 @@ fun HomeScreen(
                 }
             }
 
-            //SEARCH BAR
+            ScanBookCard(
+                onClick = {
+                    navController.navigate("search_book")
+                }
+            )
+
             Row(
                 modifier = Modifier
-                    .padding(
-                        top = 20.dp,
-                        start = 20.dp,
-                        end = 20.dp
-                    ),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
-                var active by rememberSaveable { mutableStateOf(false) }
-
-                val searchBarOffset by animateDpAsState(
-                    targetValue = if (isSearchActive) 0.dp else 20.dp,
-                    label = "searchBarOffset"
+                Text(
+                    "Informasi Terbaru",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    fontFamily = ManropeFamily,
+                    color = Color.Black
                 )
 
-                SearchBar2(
-                    placeholderText = "Apa yang ingin anda cari?",
-                    query = searchText,
-                    onQueryChange = { searchText = it },
-                    onSearch = {
-                        mainViewmodel.fetchBook(searchText)
-                        mainViewmodel.addToSearchHistory(searchText)
-                        searchText = ""
-                    },
+                Text(
+                    "Lihat Jadwal",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp,
+                    fontFamily = ManropeFamily,
+                    color = Color(0xff2846CF),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .border(1.dp, Color(0xffEBEBEB), RoundedCornerShape(8.dp))
-                        .background(Color(0xffF7F8FC))
-                        .height(52.dp),
-                    active = isSearchActive,
-                    onActiveChange = { isSearchActive = it }
+                        .clickable {
+                            navController.navigate("schedule_list") {
+                                launchSingleTop = true
+                            }
+                        }
                 )
-
-                Image(
-                    painter = painterResource(id = R.drawable.ic_scan_filled),
-                    contentDescription = "Scan",
-                    modifier = Modifier
-                        .padding(start = 12.dp)
-                        .size(52.dp)
-                )
-
             }
 
             // HOME CARD
             AnimatedVisibility(visible = !isSearchActive) {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(start = 20.dp, end = 20.dp, top = 16.dp)
-//                ) {
-//                    Card(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .clip(RoundedCornerShape(10.dp))
-//                    ) {
-//                        Column(
-//                            modifier = Modifier
-//                                .wrapContentHeight() // <--- biar tinggi ngikutin isi
-//                                .background(Color.Red) // untuk debug tinggi column
-//                        ) {
-//                            Image(
-//                                painter = painterResource(R.drawable.background),
-//                                contentDescription = "Card Event",
-//                                modifier = Modifier.fillMaxWidth()
-//                            )
-//
-//                            // Konten teks dan tombol
-//                            Column(modifier = Modifier.padding(bottom = 12.dp)) {
-//                                Row(
-//                                    modifier = Modifier
-//                                        .fillMaxWidth()
-//                                        .padding(start = 16.dp, top = 12.dp, end = 16.dp),
-//                                    horizontalArrangement = Arrangement.SpaceBetween,
-//                                    verticalAlignment = Alignment.CenterVertically
-//                                ) {
-//                                    Card(
-//                                        shape = RoundedCornerShape(32),
-//                                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
-//                                        backgroundColor = Color.White.copy(alpha = 0.1f),
-//                                        modifier = Modifier
-//                                            .clickable {}
-//                                            .height(24.dp)
-//                                    ) {
-//                                        Text(
-//                                            text = "PENGUMUMAN \uD83D\uDCDD",
-//                                            fontSize = 10.sp,
-//                                            fontWeight = FontWeight.Bold,
-//                                            fontFamily = ManropeFamily,
-//                                            color = Color.White.copy(alpha = 0.5f),
-//                                            modifier = Modifier.padding(horizontal = 12.dp)
-//                                        )
-//                                    }
-//
-//                                    Icon(
-//                                        imageVector = Icons.Filled.MoreHoriz,
-//                                        contentDescription = " ",
-//                                        tint = Color.White
-//                                    )
-//                                }
-//
-//                                Text(
-//                                    text = "Jadwal Pengambilan dan\nPengembalian",
-//                                    fontWeight = FontWeight.Bold,
-//                                    modifier = Modifier.padding(top = 8.dp, start = 16.dp),
-//                                    fontSize = 14.sp,
-//                                    fontFamily = ManropeFamily,
-//                                    color = Color.White,
-//                                    lineHeight = 20.sp
-//                                )
-//
-//                                Text(
-//                                    text = "Buku mata pelajaran ditujukan\nkepada seluruh siswa dan siswi\nSMKN 7 Semarang.",
-//                                    modifier = Modifier.padding(top = 6.dp, start = 16.dp),
-//                                    fontWeight = FontWeight.Light,
-//                                    fontFamily = ManropeFamily,
-//                                    fontSize = 10.sp,
-//                                    color = Color.White,
-//                                    lineHeight = 16.sp
-//                                )
-//
-//                                Button(
-//                                    onClick = {
-//                                        mainViewmodel.getSchedule(
-//                                            onSuccess = {
-//                                                navController.navigate("schedule_list") {
-//                                                    launchSingleTop = true
-//                                                    popUpTo("home") { inclusive = true }  // Menutup stack sebelumnya
-//                                                }
-//                                            },
-//                                            onError = {
-//                                                Log.e("Schedule", "Gagal: $it")
-//                                            }
-//                                        )
-//                                    },
-//                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xff2846CF)),
-//                                    modifier = Modifier
-//                                        .padding(start = 16.dp, top = 12.dp)
-//                                        .height(36.dp)
-//                                        .width(140.dp),
-//                                    shape = RoundedCornerShape(30.dp)
-//                                ) {
-//                                    Row(
-//                                        modifier = Modifier.fillMaxWidth(),
-//                                        horizontalArrangement = Arrangement.SpaceBetween,
-//                                        verticalAlignment = Alignment.CenterVertically
-//                                    ) {
-//                                        Text(
-//                                            text = stringResource(id = R.string.lihat),
-//                                            fontFamily = ManropeFamily,
-//                                            fontWeight = FontWeight.Medium,
-//                                            fontSize = 12.sp,
-//                                            color = Color.White
-//                                        )
-//
-//                                        Icon(
-//                                            painter = painterResource(id = R.drawable.tabler_icon_arrow_narrow_right),
-//                                            contentDescription = "See",
-//                                            tint = Color.White,
-//                                            modifier = Modifier.size(14.dp)
-//                                        )
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, top = 16.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .paint(
-                            painter = painterResource(R.drawable.background),
-                            contentScale = ContentScale.FillWidth
-                        )
-
-                ) {
-
-                    Column(modifier = Modifier.wrapContentHeight()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 12.dp, end = 16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Card(
-                                shape = RoundedCornerShape(32),
-                                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
-                                backgroundColor = Color.White.copy(alpha = 0.1f),
-                                modifier = Modifier
-                                    .clickable { }
-                                    .height(24.dp)
-                            ) {
-                                Text(
-                                    text = "PENGUMUMAN \uD83D\uDCDD",
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = ManropeFamily,
-                                    color = Color.White.copy(alpha = 0.5f),
-                                    modifier = Modifier.padding(
-                                        horizontal = 12.dp,
-                                    )
-                                )
-                            }
-
-                            Icon(
-                                imageVector = Icons.Filled.MoreHoriz,
-                                contentDescription = " ",
-                                tint = Color.White
-                            )
-                        }
-
-                        Text(
-                            text = "Jadwal Pengambilan dan\nPengembalian",
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(top = 8.dp, start = 16.dp),
-                            fontSize = 14.sp,
-                            fontFamily = ManropeFamily,
-                            color = Color.White,
-                            lineHeight = 20.sp
-                        )
-
-                        Text(
-                            text = "Buku mata pelajaran ditujukan\nkepada seluruh siswa dan siswi\nSMKN 7 Semarang.",
-                            modifier = Modifier.padding(top = 6.dp, start = 16.dp),
-                            fontWeight = FontWeight.Light,
-                            fontFamily = ManropeFamily,
-                            fontSize = 10.sp,
-                            color = Color.White,
-                            lineHeight = 16.sp
-                        )
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        Button(
-                            onClick = {
-//                                shouldNavigateToSchedule = true
-//                                mainViewmodel.getSchedule(
-//                                    onSuccess = {
-//                                        navController.navigate("schedule_list") {
-//                                            launchSingleTop = true
-//                                            popUpTo("home") {
-//                                                inclusive = true
-//                                            }  // Menutup stack sebelumnya
-//                                        }
-//                                    },
-//                                    onError = {
-//                                        Log.e("Schedule", "Gagal: $it")
-//                                    }
-//                                )
-
-                                navController.navigate("schedule_list") {
-                                    launchSingleTop = true
-                                }
-
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xff2846CF)
-                            ),
-                            modifier = Modifier
-                                .padding(start = 16.dp, bottom = 8.dp)
-                                .height(36.dp)
-                                .width(140.dp),
-                            shape = RoundedCornerShape(30.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = stringResource(id = R.string.lihat),
-                                    fontFamily = ManropeFamily,
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 12.sp,
-                                    color = Color.White
-                                )
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.tabler_icon_arrow_narrow_right),
-                                    contentDescription = "See",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            }
+                HomeCard(
+                    onClick = {
+                        navController.navigate("schedule_list") {
+                            launchSingleTop = true
                         }
                     }
-                }
+                )
             }
 
             // FAQ SECTION
@@ -569,6 +317,9 @@ fun HomeScreen(
                         modifier = Modifier
                             .weight(1f)
                             .height(140.dp)
+                            .clickable {
+                                showWarningDialog = true
+                            }
                             .clip(RoundedCornerShape(16.dp))
                             .border(1.dp, Color(0xffEBEBEB), RoundedCornerShape(16.dp)),
                         backgroundColor = Color(0xffF7F8FC)
@@ -658,7 +409,16 @@ fun HomeScreen(
                 }
 
                 NewsList(
-                    newsList = NewsData().loadNewsData()
+                    newsList = NewsData().loadNewsData(),
+                    onNewsClick = {
+                        navController.navigate("news_content")
+                    }
+                )
+            }
+
+            if(showWarningDialog) {
+                LoanWarningDialog(
+                    onDismissRequest = { showWarningDialog = false }
                 )
             }
 
@@ -666,91 +426,93 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 20.dp, end = 20.dp, top = 22.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Row(
+                    if(searchHistory.isNotEmpty()) {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 20.dp)
-                                .clickable {
-                                    mainViewmodel.fetchBook(searchText)
-                                },
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(start = 20.dp, end = 20.dp, top = 22.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
-                            Text(
-                                "Terakhir Dicari",
-                                fontSize = 14.sp,
-                                fontFamily = ManropeFamily,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xff111111)
-                            )
-
-                            Text(
-                                "Hapus Semua",
-                                fontSize = 12.sp,
-                                fontFamily = ManropeFamily,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xff2846CF),
-                                modifier = Modifier.clickable {
-                                    mainViewmodel.clearSearchHistory()
-                                }
-                            )
-                        }
-
-
-                        Card(
-                            shape = RoundedCornerShape(12.dp),
-                            backgroundColor = Color(0XFFF7F8FC),
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 20.dp)
+                                    .clickable {
+                                        mainViewmodel.searchBook(searchText)
+                                    },
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                searchHistory.forEach { history ->
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier
-                                            .padding(bottom = 12.dp)
-                                            .clickable {
-                                                searchText = history
-                                                mainViewmodel.fetchBook(history)
-                                                mainViewmodel.addToSearchHistory(history)
-                                                navController.navigate("bookDetail")
-                                            }
-                                    ) {
-                                        Image(
-                                            painter = painterResource(id = R.drawable.tabler_icon_clock),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(16.dp)
-                                        )
+                                Text(
+                                    "Terakhir Dicari",
+                                    fontSize = 14.sp,
+                                    fontFamily = ManropeFamily,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color(0xff111111)
+                                )
+
+                                Text(
+                                    "Hapus Semua",
+                                    fontSize = 12.sp,
+                                    fontFamily = ManropeFamily,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xff2846CF),
+                                    modifier = Modifier.clickable {
+                                        mainViewmodel.clearSearchHistory()
+                                    }
+                                )
+                            }
 
 
-                                        Spacer(modifier = Modifier.width(6.dp))
-
-
-                                        Text(
-                                            text = history,
-                                            fontSize = 12.sp,
-                                            fontFamily = ManropeFamily,
-                                            fontWeight = FontWeight.SemiBold
-                                        )
-
-                                        Spacer(modifier = Modifier.weight(1f))
-
-                                        Icon(
-                                            imageVector = Icons.Default.Close,
-                                            contentDescription = null,
+                            Card(
+                                shape = RoundedCornerShape(12.dp),
+                                backgroundColor = Color(0XFFF7F8FC),
+                            ) {
+                                Column(
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    searchHistory.forEach { history ->
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
                                             modifier = Modifier
-                                                .size(16.dp)
+                                                .padding(bottom = 12.dp)
                                                 .clickable {
-                                                    mainViewmodel.removeFromSearchHistory(history)
+                                                    searchText = history
+                                                    mainViewmodel.searchBook(history)
+                                                    mainViewmodel.addToSearchHistory(history)
+                                                    navController.navigate("bookDetail")
                                                 }
-                                        )
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.tabler_icon_clock),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+
+
+                                            Spacer(modifier = Modifier.width(6.dp))
+
+
+                                            Text(
+                                                text = history,
+                                                fontSize = 12.sp,
+                                                fontFamily = ManropeFamily,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+
+                                            Spacer(modifier = Modifier.weight(1f))
+
+                                            Icon(
+                                                imageVector = Icons.Default.Close,
+                                                contentDescription = null,
+                                                modifier = Modifier
+                                                    .size(16.dp)
+                                                    .clickable {
+                                                        mainViewmodel.removeFromSearchHistory(history)
+                                                    }
+                                            )
+                                        }
                                     }
                                 }
                             }

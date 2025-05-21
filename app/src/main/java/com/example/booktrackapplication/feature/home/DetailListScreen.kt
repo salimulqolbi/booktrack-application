@@ -2,13 +2,16 @@ package com.example.booktrack.feature.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material3.Scaffold
@@ -33,47 +36,52 @@ import com.example.booktrackapplication.ui.theme.ManropeFamily
 fun DetailListScreen(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 52.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xffF7F8FC))
+                        .border(1.dp, Color(0xffEBEBEB), CircleShape)
+                        .align(Alignment.CenterStart)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.arrow_right),
+                        contentDescription = "Back",
+                        tint = Color(0xff2846CF),
+                    )
+                }
+
+                Text(
+                    "Berita Terbaru",
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .background(Color.White)
                     .padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp, start = 20.dp, end = 20.dp)
-                ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xffF7F8FC))
-                            .border(1.dp, Color(0xffEBEBEB), CircleShape)
-                            .align(Alignment.CenterStart)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.arrow_right),
-                            contentDescription = "Back",
-                            tint = Color(0xff2846CF),
-                        )
-                    }
-
-                    Text(
-                        text = stringResource(id = R.string.berita_terbaru),
-                        fontFamily = ManropeFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = Color.Black,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-
                 NewsList(
-                    newsList = NewsData().loadNewsData()
+                    newsList = NewsData().loadNewsData(),
+                    onNewsClick = {
+                        navController.navigate("news_content")
+                    }
                 )
             }
         }

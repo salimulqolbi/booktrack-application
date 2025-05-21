@@ -17,11 +17,13 @@ import com.example.booktrack.utils.Resource
 import com.example.booktrackapplication.data.datastore.DataStoreManager
 import com.example.booktrackapplication.data.request.ActiveAccRequest
 import com.example.booktrackapplication.data.request.LoginRequest
+import com.example.booktrackapplication.data.response.ProfileResponse
 import com.example.booktrackapplication.utils.dataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -38,8 +40,8 @@ class RegistrationViewModel(
     var loginstrationUiState by mutableStateOf(LoginUiState())
         private set
 
-//    var user by mutableStateOf<UserResponse?>(null)
-//        private set
+    private val _userUiState = MutableStateFlow(UserState())
+    val userUiState: StateFlow<UserState> = _userUiState.asStateFlow()
 
     private val _user = MutableStateFlow<UserResponse?>(null)
     val user: StateFlow<UserResponse?> = _user.asStateFlow()
@@ -48,7 +50,10 @@ class RegistrationViewModel(
     var currentUser by mutableStateOf<UserResponse?>(null)
 
     fun onNisChange(newValue: String) {
-        registrationUiState = registrationUiState.copy(nis = newValue)
+        registrationUiState = registrationUiState.copy(
+            nis = newValue,
+            nisError = null
+        )
     }
 
     fun onPhoneNumberChange(newValue: String) {
@@ -56,7 +61,10 @@ class RegistrationViewModel(
     }
 
     fun onOldPasswordChange(newValue: String) {
-        registrationUiState = registrationUiState.copy(oldPassword = newValue)
+        registrationUiState = registrationUiState.copy(
+            oldPassword = newValue,
+            passwordError = null
+        )
     }
 
     fun onNewPasswordChange(newValue: String) {
@@ -64,11 +72,17 @@ class RegistrationViewModel(
     }
 
     fun onNisLoginChange(newValue: String) {
-        loginstrationUiState = loginstrationUiState.copy(nis = newValue)
+        loginstrationUiState = loginstrationUiState.copy(
+            nis = newValue,
+            nisError = null
+        )
     }
 
     fun onPasswordChange(newValue: String) {
-        loginstrationUiState = loginstrationUiState.copy(password = newValue)
+        loginstrationUiState = loginstrationUiState.copy(
+            password = newValue,
+            passError = null
+        )
     }
 
     init {
@@ -98,20 +112,29 @@ class RegistrationViewModel(
                             registrationUiState = registrationUiState.copy(
                                 isLoading = false,
                                 isSuccess = true,
-                                response = result.data
+                                response = result.data,
+                                nisError = null,
+                                passwordError = null
                             )
                             Log.d("RegistrationViewModel", "activeAccount: ${result.data}")
                             onResult(true) // Panggil callback jika sukses
                         }
 
                         is Resource.Error -> {
+                            val message = result.message ?: "Terjadi kesalahan"
+
+                            val nisError = if (message.contains("nis", true)) message else null
+                            val passwordError = if (message.contains("password", true)) message else null
                             registrationUiState = registrationUiState.copy(
                                 isLoading = false,
                                 isError = true,
-                                errorMessage = result.message
+//                                errorMessage = result.message
+                                errorMessage =  if (nisError == null && passwordError == null) message else null,
+                                nisError = nisError,
+                                passwordError = passwordError
                             )
                             Log.e("RegistrationViewModel", "activeAccount: ${result.message}")
-                            onResult(false) // Gagal, tetap di halaman register
+                            onResult(false)
                         }
                     }
                 }
@@ -171,10 +194,18 @@ class RegistrationViewModel(
                         }
 
                         is Resource.Error -> {
+                            val message = result.message ?: "Terjadi kesalahan"
+
+                            val nisError = if (message.contains("nis", true)) message else null
+                            val passError = if (message.contains("password", true)) message else null
+
                             loginstrationUiState = loginstrationUiState.copy(
                                 isLoading = false,
                                 isError = true,
-                                errorMessage = result.message
+//                                errorMessage = result.message
+                                errorMessage = if (nisError == null && passError == null) message else null,
+                                nisError = nisError,
+                                passError = passError
                             )
                             Log.e("book", "Login gagal: ${result.message}")
                             onResult(false)
@@ -224,7 +255,6 @@ class RegistrationViewModel(
 
     }
 
-
     fun getToken(): String? {
         var token: String? = null
         runBlocking {
@@ -232,6 +262,56 @@ class RegistrationViewModel(
         }
         return token
     }
+
+    fun clearToken() {
+        runBlocking {
+            dataStoreManager.clearToken()
+        }
+    }
+
+    fun getUser() {
+        viewModelScope.launch {
+            _userUiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
+            }
+
+            when( val result = authRepository.getUser()) {
+                is Resource.Success -> {
+                    val user = result.data?.data
+
+                    _userUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            user = user,
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    _userUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message ?: "Gagal memuat User"
+                        )
+                    }
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+    fun clearError() {
+        registrationUiState = registrationUiState.copy(
+            isError = false,
+            errorMessage = null
+        )
+    }
+
 
 }
 
@@ -244,6 +324,9 @@ data class RegistrationUiState(
     val isSuccess: Boolean = false,
     val isError: Boolean = false,
     val errorMessage: String? = null,
+    val nisError: String? = null,
+    val passwordError: String? = null,
+    val generalError: String? = null,
     val response: ActiveAccResponse? = null
 )
 
@@ -254,5 +337,13 @@ data class LoginUiState(
     val isSuccess: Boolean = false,
     val isError: Boolean = false,
     val errorMessage: String? = null,
+    val nisError: String? = null,
+    val passError: String? = null,
     val response: LoginResponse? = null
+)
+
+data class UserState(
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val user: ProfileResponse? = null
 )

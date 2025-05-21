@@ -36,16 +36,19 @@ import com.example.booktrackapplication.model.NewsItems
 import com.example.booktrackapplication.ui.theme.ManropeFamily
 
 @Composable
-fun NewsList(newsList: List<NewsItems>) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 57.dp)
+fun NewsList(newsList: List<NewsItems>,onNewsClick: () -> Unit = {}) {
+    Column(
+        modifier = Modifier
+            .padding(start = 20.dp, end = 20.dp, top = 57.dp)
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(newsList) { news ->
+        newsList.forEach { news ->
             NewsCard(
-                newsItems = news
+                newsItems = news,
+                onNewsClick = {onNewsClick()}
             )
-            Spacer(modifier = Modifier.height(12.dp))
+//            Spacer(modifier = Modifier.height(12.dp))
             Divider()
         }
     }
@@ -53,9 +56,9 @@ fun NewsList(newsList: List<NewsItems>) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun NewsCard(newsItems: NewsItems, modifier: Modifier = Modifier) {
+fun NewsCard(newsItems: NewsItems, modifier: Modifier = Modifier, onNewsClick: () -> Unit = {}) {
     Row(
-        modifier.fillMaxWidth()
+        modifier.fillMaxWidth().clickable { onNewsClick() }
     ) {
         Image(
             painter = painterResource(newsItems.image),

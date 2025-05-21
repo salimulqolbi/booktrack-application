@@ -4,13 +4,17 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -22,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -56,9 +61,11 @@ fun ConfirmBookDialog(
                     .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Start
             ) {
-                Row {
+                Row(
+                    modifier = Modifier.weight(1f),
+                ) {
                     Card(
                         shape = RoundedCornerShape(8.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xffF7F8FC)),
@@ -90,7 +97,7 @@ fun ConfirmBookDialog(
                                 start = 12.dp
                             ),
                         verticalArrangement = Arrangement.spacedBy(4.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.Start,
                     ) {
                         Text(
                             book.title,
@@ -114,10 +121,11 @@ fun ConfirmBookDialog(
                     }
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
                 IconButton(
                     onClick = onConfirm,
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(44.dp)
                         .clip(CircleShape)
                         .background(Color(0xff2846CF))
                         .border(1.dp, Color(0xffEBEBEB), CircleShape)
@@ -126,7 +134,8 @@ fun ConfirmBookDialog(
                     Icon(
                         painter = painterResource(id = R.drawable.arrow_left),
                         contentDescription = "Next",
-                        tint = Color(0xff2846CF),
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }

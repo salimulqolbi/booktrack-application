@@ -42,6 +42,37 @@ import com.example.booktrackapplication.ui.theme.ManropeFamily
 fun NewsContentScreen(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 52.dp, start = 20.dp, end = 20.dp)
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xffF7F8FC))
+                        .border(1.dp, Color(0xffEBEBEB), CircleShape)
+                        .align(Alignment.CenterStart)
+                ) {
+                    androidx.compose.material.Icon(
+                        painter = painterResource(id = R.drawable.arrow_right),
+                        contentDescription = "Back",
+                        tint = Color(0xff2846CF),
+                    )
+                }
+
+                Text(
+                    " ",
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        },
         content = { paddingValues ->
             LazyColumn(
                 modifier = Modifier
@@ -49,45 +80,6 @@ fun NewsContentScreen(navController: NavController) {
                     .background(Color.White)
                     .padding(paddingValues),
             ) {
-                item {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 24.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                    ) {
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xffF7F8FC))
-                                .border(1.dp, Color(0xffEBEBEB), CircleShape),
-                        ) {
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.arrow_right),
-                                contentDescription = "Back",
-                                tint = Color(0xff2846CF),
-                            )
-                        }
-
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xffF7F8FC))
-                                .border(1.dp, Color(0xffEBEBEB), CircleShape),
-                        ) {
-                            androidx.compose.material.Icon(
-                                painter = painterResource(id = R.drawable.ic_titik_3),
-                                contentDescription = "Back",
-                                tint = Color(0xff2846CF),
-                            )
-                        }
-                    }
-                }
-
                 item {
                     Image(
                         painter = painterResource(id = R.drawable.book_content_1),

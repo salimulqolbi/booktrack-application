@@ -5,6 +5,7 @@ import com.example.booktrack.data.response.LoginResponse
 import com.example.booktrack.utils.Resource
 import com.example.booktrackapplication.data.request.ActiveAccRequest
 import com.example.booktrackapplication.data.request.LoginRequest
+import com.example.booktrackapplication.data.response.GetUserResponse
 
 interface AuthRepository {
 
@@ -12,7 +13,7 @@ interface AuthRepository {
 
     suspend fun login(request: LoginRequest): Resource<LoginResponse>
 
-//    suspend fun getUser(token: String): Resource<UserResponse>
+    suspend fun getUser(): Resource<GetUserResponse>
 
     suspend fun logout(): Resource<Unit>
 

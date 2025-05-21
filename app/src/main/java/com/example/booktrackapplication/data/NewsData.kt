@@ -21,69 +21,6 @@ class NewsData() {
                 time = time,
                 image = R.drawable.newsitem_image_1,
                 tags = listOf("Digitalisasi", "Mapel", "Stemba")
-            ),
-            NewsItems(
-                "Peluncuran Aplikasi Perpustakaan Biblioo",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_2,
-                tags = listOf("Buku Mapel")
-            ),
-            NewsItems(
-                "Digitalisasi Pengambilan Buku Mapel Stemba",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_1,
-                tags = listOf("Digitalisasi", "Mapel", "Stemba")
-            ),
-            NewsItems(
-                "Peluncuran Aplikasi Perpustakaan Biblioo",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_2,
-                tags = listOf("Buku Mapel")
-            ),
-            NewsItems(
-                "Perpustakaan Bukan Lagi Tempat Kuno",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_3,
-                tags = listOf("Perpustakaan", "Pendidikan", "Inovasi")
-            ),
-            NewsItems(
-                "Wajib Tahu! Kebiasaan Buruk di Perpustakaan",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_4,
-                tags = listOf("Attitude", "Perpustakaan")
-            ),
-            NewsItems(
-                "Pahami Fungsi Perpustakaan Sebenarnya",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image5,
-                tags = listOf("Kreativitas", "Teknologi")
-            ),
-            NewsItems(
-                "Perpustakaan Bukan Lagi Tempat Kuno",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_3,
-                tags = listOf("Perpustakaan", "Pendidikan", "Inovasi")
-            ),
-            NewsItems(
-                "Wajib Tahu! Kebiasaan Buruk di Perpustakaan",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image_4,
-                tags = listOf("Attitude", "Perpustakaan")
-            ),
-            NewsItems(
-                "Pahami Fungsi Perpustakaan Sebenarnya",
-                date = date,
-                time = time,
-                image = R.drawable.newsitem_image5,
-                tags = listOf("Kreativitas", "Teknologi")
             )
         )
     }
