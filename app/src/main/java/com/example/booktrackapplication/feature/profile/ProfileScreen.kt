@@ -46,6 +46,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +64,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.booktrackapplication.R
+import com.example.booktrackapplication.utils.LogoutWarning
 import com.example.booktrackapplication.utils.convertToRoman
 import com.example.booktrackapplication.utils.extractAbbreviation
 import com.example.booktrackapplication.viewmodel.MainViewmodel
@@ -87,6 +91,8 @@ fun ProfileScreen(
     val jurusan = user.user?.departmentId ?: " "
 
     val image = R.drawable.anonimus
+
+    var showDialog by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -191,15 +197,16 @@ fun ProfileScreen(
                     ),
                     border = BorderStroke(1.dp, Color(0xffEBEBEB)),
                     onClick = {
-                        viewModel.logout { success ->
-                            if (success) {
-                                navController.navigate("login") {
-                                    popUpTo("main") { inclusive = true }
-                                }
-                            } else {
-                                Toast.makeText(context, "Logout gagal", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        showDialog = true
+//                        viewModel.logout { success ->
+//                            if (success) {
+//                                navController.navigate("login") {
+//                                    popUpTo("main") { inclusive = true }
+//                                }
+//                            } else {
+//                                Toast.makeText(context, "Logout gagal", Toast.LENGTH_SHORT).show()
+//                            }
+//                        }
                     }
                 ) {
                     Row(
@@ -221,6 +228,24 @@ fun ProfileScreen(
                             color = Color.Black
                         )
                     }
+                }
+
+                if(showDialog) {
+                    LogoutWarning(
+                        onDismissRequest = { showDialog = false },
+                        onConfirm = {
+                            viewModel.logout { success ->
+                                if (success) {
+                                    navController.navigate("login") {
+                                        popUpTo("main") { inclusive = true }
+                                    }
+                                } else {
+                                    Toast.makeText(context, "Logout gagal", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                            showDialog = false
+                        }
+                    )
                 }
             }
         }
