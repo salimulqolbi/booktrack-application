@@ -1,6 +1,7 @@
 package com.example.booktrackapplication.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -12,9 +13,15 @@ import com.example.booktrack.data.repository.main.MainRepository
 import com.example.booktrack.data.response.BookData
 import com.example.booktrack.data.response.Curriculum
 import com.example.booktrack.data.response.ScheduleItem
+import com.example.booktrack.data.response.UserResponse
 import com.example.booktrack.utils.Resource
+import com.example.booktrackapplication.data.datastore.DataStoreManager
+import com.example.booktrackapplication.data.response.ActivityItem
 import com.example.booktrackapplication.data.response.BookLoanRequest
+import com.example.booktrackapplication.data.response.BookReturnRequest
 import com.example.booktrackapplication.data.response.BorrowBooksResponse
+import com.example.booktrackapplication.data.response.HistoryItem
+import com.example.booktrackapplication.data.response.ProfileResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,11 +32,14 @@ import org.koin.core.component.KoinComponent
 
 class MainViewmodel(
     private val mainRepository: MainRepository,
-    private val authRepository: AuthRepository
+    private val dataStoreManager: DataStoreManager
 ) : ViewModel(), KoinComponent {
 
     private val _uiState = MutableStateFlow(BorrowUiState())
     val uiState: StateFlow<BorrowUiState> = _uiState.asStateFlow()
+
+    private val _returnUiState = MutableStateFlow(ReturnUiState())
+    val returnUiState: StateFlow<ReturnUiState> = _returnUiState.asStateFlow()
 
     private val _loanedBooks = mutableStateListOf<BookData>()
     val loanedBooks: List<BookData> = _loanedBooks
@@ -37,7 +47,28 @@ class MainViewmodel(
     private val _searchHistory = mutableStateListOf<String>()
     val searchHistory: List<String> get() = _searchHistory
 
+    private val _errorMessageState = mutableStateOf<String?>(null)
+    val errorMessageState: State<String?> = _errorMessageState
+
+//    private val _activityState = mutableStateListOf<ActivityItem>()
+//    val activityState: List<ActivityItem> = _activityState
+
+    private val _activityUiState = MutableStateFlow(ActivityUiState())
+    val activityUiState: StateFlow<ActivityUiState> = _activityUiState.asStateFlow()
+
+    private val _historyUiState = MutableStateFlow(HistoryUiState())
+    val historyUiState: StateFlow<HistoryUiState> = _historyUiState.asStateFlow()
+
+    private val _userUiState = MutableStateFlow(UserUiState())
+    val userUiState: StateFlow<UserUiState> = _userUiState.asStateFlow()
+
+    private val _searchBook = MutableStateFlow<BookData?>(null)
+    val searchBook = _searchBook.asStateFlow()
+
     var scannedBook by mutableStateOf<BookData?>(null)
+        private set
+
+    var searchedBook by mutableStateOf<BookData?>(null)
         private set
 
     var submitResult by mutableStateOf<String?>(null)
@@ -94,7 +125,11 @@ class MainViewmodel(
                         }
                         return@launch
                     } else {
-                        _uiState.update { it.copy(eventId = dataResult.data.eventId) }
+                        _uiState.update {
+                            it.copy(
+                                eventId = dataResult.data.eventId
+                            )
+                        }
                     }
                 }
 
@@ -148,13 +183,16 @@ class MainViewmodel(
 
     fun clearSuccessFlag() {
         _uiState.update { it.copy(isSuccess = false) }
+        _returnUiState.update { it.copy(isSuccess = false) }
     }
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+        _returnUiState.update { it.copy(errorMessage = null) }
     }
 
     fun fetchBook(code: String) {
+        Log.d("BOOK_DEBUG", "fetchBook() called with: $code")
         viewModelScope.launch {
             isLoading = true
             errorMessage = null
@@ -173,8 +211,82 @@ class MainViewmodel(
         }
     }
 
+    fun searchBook(code: String) {
+        Log.d("BOOK_DEBUG", "fetchBook() called with: $code")
+        viewModelScope.launch {
+            try {
+                isLoading = true
+                errorMessage = null
+                when (val result = mainRepository.scanBookBarcode(code)) {
+                    is Resource.Success -> {
+                        _searchBook.value = result.data?.data
+
+                        Log.d("BOOK_DEBUG", "fetchBook() called with: ${_searchBook.value}")
+                    }
+
+                    is Resource.Error -> {
+                        errorMessage = result.message
+                    }
+
+                    else -> Unit
+                }
+                isLoading = false
+            } catch (e: Exception) {
+                // Handle error jika ada masalah dengan API request
+                _searchBook.value = null
+            }
+        }
+    }
+
+    fun resetSearchResult() {
+        _searchBook.value = null
+    }
+
+
+    fun fetchReturnBook(code: String) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = null // Reset error message
+            when (val result = mainRepository.scanBookBarcode(code)) {
+                is Resource.Success -> {
+                    scannedBook = result.data?.data
+                    val borrowedId = scannedBook?.borrowedBy?.name
+
+                    if (borrowedId != dataStoreManager.getUser()?.name) {
+                        _errorMessageState.value = "Scan Dibatalkan. Buku ini bukan milik Anda."
+                        scannedBook = null  // Clear scannedBook if the user doesn't match
+                    } else {
+                        // Buku valid dan sesuai
+                        scannedBook = scannedBook
+                    }
+                }
+
+                is Resource.Error -> {
+                    errorMessage = result.message
+                    scannedBook = null  // Clear scannedBook if there's an error
+                }
+
+                else -> Unit
+            }
+            isLoading = false
+        }
+    }
+
+
+    fun clearErrorMessage() {
+        _errorMessageState.value = null
+    }
+
+    fun resetReturnBook() {
+        scannedBook = null
+        _loanedBooks.clear()
+        _errorMessageState.value = null
+        errorMessage = null
+    }
+
     fun reset() {
         scannedBook = null
+        _errorMessageState.value = null
         errorMessage = null
     }
 
@@ -236,7 +348,7 @@ class MainViewmodel(
 
     fun addToSearchHistory(query: String) {
         if (query.isNotBlank() && !_searchHistory.contains(query)) {
-            _searchHistory.add(0, query) // Masukkan di awal list
+            _searchHistory.add(0, query)
         }
     }
 
@@ -300,8 +412,6 @@ class MainViewmodel(
 
                     onFinish(false)
                 }
-
-                else -> Unit
             }
         }
     }
@@ -313,10 +423,39 @@ data class BorrowUiState(
     val isSuccess: Boolean = false,
     val curriculum: Curriculum? = null,
     val eventId: Int? = null,
-
     val schedules: List<ScheduleItem> = emptyList(),
-
     val submitMessage: String? = null,
     val notFoundBooks: List<String> = emptyList(),
     val unavailableBooks: List<String> = emptyList()
+)
+
+data class ActivityUiState(
+    val isLoading: Boolean = false,
+    val activities: List<ActivityItem> = emptyList(),
+    val errorMessage: String? = null,
+    val emptyMessage: String? = null
+)
+
+data class HistoryUiState(
+    val isLoading: Boolean = false,
+    val history: Map<String, List<HistoryItem>> = emptyMap(),
+    val errorMessage: String? = null,
+    val emptyMessage: String? = null
+)
+
+data class ReturnUiState(
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val isSuccess: Boolean = false,
+    val eventId: Int? = null,
+    val curriculum: Curriculum? = null,
+    val submitMessage: String? = null,
+    val notFoundBooks: List<String> = emptyList(),
+    val unavailableBooks: List<String> = emptyList()
+)
+
+data class UserUiState(
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val user: ProfileResponse? = null
 )
