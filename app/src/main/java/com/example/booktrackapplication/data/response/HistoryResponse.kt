@@ -6,7 +6,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class HistoryResponse(
     val message: String,
-    val data: Map<String, List<HistoryItem>>
+    val data: List<HistoryGroup>
+)
+
+@Serializable
+data class HistoryGroup(
+    val semester: Int,
+    val books: List<HistoryItem>
 )
 
 @Serializable

@@ -20,8 +20,11 @@ import com.example.booktrackapplication.data.response.ActivityItem
 import com.example.booktrackapplication.data.response.BookLoanRequest
 import com.example.booktrackapplication.data.response.BookReturnRequest
 import com.example.booktrackapplication.data.response.BorrowBooksResponse
+import com.example.booktrackapplication.data.response.HistoryGroup
+//import com.example.booktrackapplication.data.response.HistoryGroup
 import com.example.booktrackapplication.data.response.HistoryItem
 import com.example.booktrackapplication.data.response.ProfileResponse
+import com.example.booktrackapplication.data.response.ReturnBooksResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -232,7 +235,6 @@ class MainViewmodel(
                 }
                 isLoading = false
             } catch (e: Exception) {
-                // Handle error jika ada masalah dengan API request
                 _searchBook.value = null
             }
         }
@@ -254,16 +256,15 @@ class MainViewmodel(
 
                     if (borrowedId != dataStoreManager.getUser()?.name) {
                         _errorMessageState.value = "Scan Dibatalkan. Buku ini bukan milik Anda."
-                        scannedBook = null  // Clear scannedBook if the user doesn't match
+                        scannedBook = null
                     } else {
-                        // Buku valid dan sesuai
                         scannedBook = scannedBook
                     }
                 }
 
                 is Resource.Error -> {
                     errorMessage = result.message
-                    scannedBook = null  // Clear scannedBook if there's an error
+                    scannedBook = null
                 }
 
                 else -> Unit
@@ -415,6 +416,205 @@ class MainViewmodel(
             }
         }
     }
+
+    fun submitReturnedBooks(onFinish: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            _returnUiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    notFoundBooks = emptyList(),
+                    unavailableBooks = emptyList()
+                )
+            }
+
+            val request = BookReturnRequest(bookCodes = loanedBooks.map { it.code })
+
+            when (val result = mainRepository.submitReturnedBook(request)) {
+                is Resource.Success -> {
+                    _returnUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            submitMessage = result.data.message,
+                            isSuccess = true
+                        )
+                    }
+                    resetBook()
+                    onFinish(true)
+                }
+
+                is Resource.Error -> {
+                    val fallbackMessage = result.message ?: "Terjadi kesalahan saat pengembalian"
+                    var notFound = emptyList<String>()
+                    var unavailable = emptyList<String>()
+                    var message = fallbackMessage
+
+                    try {
+                        val parsed = Json.decodeFromString<ReturnBooksResponse>(fallbackMessage)
+                        notFound = parsed.errors?.notFoundCodes ?: emptyList()
+                        unavailable = parsed.errors?.unavailableBooks ?: emptyList()
+                        message = parsed.message
+                    } catch (_: Exception) {}
+
+                    _returnUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = message,
+                            notFoundBooks = notFound,
+                            unavailableBooks = unavailable
+                        )
+                    }
+
+                    onFinish(false)
+                }
+            }
+        }
+    }
+
+    fun clearSubmitMessage() {
+        _returnUiState.update {
+            it.copy(submitMessage = null)
+        }
+    }
+
+    fun validateRetuningDate() {
+        viewModelScope.launch {
+            _returnUiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    isSuccess = false
+                )
+            }
+
+            when (val dataResult = mainRepository.validateReturningDate()) {
+                is Resource.Success -> {
+                    if (!dataResult.data.valid) {
+                        _returnUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = dataResult.data.message
+                            )
+                        }
+                    } else {
+                        _returnUiState.update {
+                            it.copy(
+                                isLoading = false,
+                                eventId = dataResult.data.eventId,
+                                isSuccess = true // ✅ Tambahkan ini
+                            )
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    _returnUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = dataResult.message
+                        )
+                    }
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+    fun getActivity() {
+        viewModelScope.launch {
+            _activityUiState.update { it.copy(isLoading = true, errorMessage = null, emptyMessage = null) }
+
+            when (val result = mainRepository.getActivity()) {
+                is Resource.Success -> {
+                    val data = result.data?.data ?: emptyList()
+
+                    _activityUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            activities = data,
+                            errorMessage = null,
+                            emptyMessage = if (data.isEmpty()) "Tidak ada aktivitas ditemukan" else null
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    _activityUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message ?: "Terjadi kesalahan",
+                            activities = emptyList()
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun getHistory() {
+        viewModelScope.launch {
+            _historyUiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null,
+                    emptyMessage = null
+                )
+            }
+
+            when (val result = mainRepository.getHistory()) {
+                is Resource.Success -> {
+                    val historyItems: List<HistoryGroup> = result.data.data.orEmpty()
+
+                    _historyUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            history = historyItems,
+                            emptyMessage = if (historyItems.isEmpty()) "Belum ada Riwayat" else null
+                        )
+                    }
+                }
+
+                is Resource.Error -> {
+                    _historyUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message ?: "Gagal memuat riwayat"
+                        )
+                    }
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+    fun getUser() {
+        viewModelScope.launch {
+            _userUiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            when (val result = mainRepository.getUser()) {
+                is Resource.Success -> {
+                    _userUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            user = result.data.data,
+                            errorMessage = null
+                        )
+                    }
+                }
+                is Resource.Error -> {
+                    _userUiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = result.message,
+                            user = null
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 data class BorrowUiState(
@@ -438,10 +638,11 @@ data class ActivityUiState(
 
 data class HistoryUiState(
     val isLoading: Boolean = false,
-    val history: Map<String, List<HistoryItem>> = emptyMap(),
+    val history: List<HistoryGroup> = emptyList(),
     val errorMessage: String? = null,
     val emptyMessage: String? = null
 )
+
 
 data class ReturnUiState(
     val isLoading: Boolean = false,
