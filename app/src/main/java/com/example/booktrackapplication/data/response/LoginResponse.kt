@@ -10,4 +10,6 @@ data class LoginResponse(
 )
 
 @Serializable
-data class ErrorLoginResponse(val message: String)
+data class ErrorLoginResponse(
+    val message: Map<String, List<String>>
+)

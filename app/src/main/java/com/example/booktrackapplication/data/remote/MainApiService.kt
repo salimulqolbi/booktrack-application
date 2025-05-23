@@ -196,7 +196,7 @@ class MainApiService (
         return withContext(Dispatchers.IO) {
             try {
                 val response: HttpResponse = client.get {
-                    url("$baseUrl/books/history")
+                    url("$baseUrl/books/history/all")
                     headers {
                         append(HttpHeaders.Authorization, "Bearer $token")
                         append(HttpHeaders.Accept, "application/json")

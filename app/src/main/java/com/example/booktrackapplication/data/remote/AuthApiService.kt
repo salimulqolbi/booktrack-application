@@ -45,11 +45,15 @@ class AuthApiService(
                 Log.d("book", "Response Body: $responseBody")
 
                 if(!response.status.isSuccess()) {
-                    val errorJson = Json.decodeFromString<ErrorResponse>(responseBody)
-                    throw Exception(errorJson.message)
+//                    val errorJson = Json.decodeFromString<ErrorResponse>(responseBody)
+                    val errorJson = Json {
+                        ignoreUnknownKeys = true
+                    }.decodeFromString<ErrorResponse>(responseBody)
+
+                    val errorMessage = errorJson.error ?: errorJson.message ?: "Terjadi kesalahan"
+                    throw Exception(errorMessage)
                 }
 
-//                response.body() // Parsing ke ActiveAccResponse
                 Json.decodeFromString(responseBody)
             } catch (e: Exception) {
                 Log.e("book", "Failed to activate account: ${e.message}")
@@ -73,11 +77,13 @@ class AuthApiService(
                 Log.d("book", "Response Body: $responseBody")
 
                 if(!response.status.isSuccess()) {
-                    val errorJson = Json.decodeFromString<ErrorLoginResponse>(responseBody)
-                    throw Exception(errorJson.message)
-                }
+//                    val errorJson = Json.decodeFromString<ErrorLoginResponse>(responseBody)
+//                    throw Exception(errorJson.message)
 
-//                response.body() // Parsing ke ActiveAccResponse
+                    val errorJson = Json.decodeFromString<ErrorLoginResponse>(responseBody)
+                    val errorMessage = errorJson.message.entries.firstOrNull()?.value?.firstOrNull() ?: "Terjadi kesalahan"
+                    throw Exception(errorMessage)
+                }
                 Json.decodeFromString(responseBody)
             } catch (e: Exception) {
                 Log.e("book", "Failed to login: ${e.message}")

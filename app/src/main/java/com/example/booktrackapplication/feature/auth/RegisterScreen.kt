@@ -173,7 +173,8 @@ fun RegistrationScreen(
                                 .clip(RoundedCornerShape(8.dp)),
                             onValueChange = {
                                 viewModel.onPhoneNumberChange(it)
-                            }
+                            },
+                            errorText = state.generalError
                         )
                     }
 
@@ -203,8 +204,6 @@ fun RegistrationScreen(
                             onValueChange = {
                                 viewModel.onOldPasswordChange(it)
                             },
-//                            isError = state.isError,
-//                            errorMessage = "Password aktivasi tidak cocok."
                             isError = state.passwordError != null,
                             errorMessage = state.passwordError
                         )
@@ -235,7 +234,9 @@ fun RegistrationScreen(
                                 .clip(RoundedCornerShape(8.dp)),
                             onValueChange = {
                                 viewModel.onNewPasswordChange(it)
-                            }
+                            },
+                            isError = state.newPasswordError != null,
+                            errorMessage = state.newPasswordError
                         )
                     }
                 }
@@ -272,13 +273,6 @@ fun RegistrationScreen(
                             fontWeight = FontWeight.SemiBold
                         )
                     }
-                }
-                if (state.isSuccess) {
-                    Text(
-                        text = state.response?.message ?: "Berhasil",
-                        color = Color.Green,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
                 }
             }
         }

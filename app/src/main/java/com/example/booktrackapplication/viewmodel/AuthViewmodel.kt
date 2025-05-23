@@ -68,8 +68,12 @@ class RegistrationViewModel(
     }
 
     fun onNewPasswordChange(newValue: String) {
-        registrationUiState = registrationUiState.copy(newPassword = newValue)
+        registrationUiState = registrationUiState.copy(
+            newPassword = newValue,
+            newPasswordError = null
+        )
     }
+
 
     fun onNisLoginChange(newValue: String) {
         loginstrationUiState = loginstrationUiState.copy(
@@ -124,14 +128,25 @@ class RegistrationViewModel(
                             val message = result.message ?: "Terjadi kesalahan"
 
                             val nisError = if (message.contains("nis", true)) message else null
-                            val passwordError = if (message.contains("password", true)) message else null
+                            val passwordError = if (!message.contains("new password", true) && message.contains("password", true)) message else null
+                            val numberPhoneError = if (
+                                message.contains("phone", true) || message.contains("number", true)
+                            ) message else null
+                            val newPasswordError = if (message.contains("new password", true)) message else null
+
                             registrationUiState = registrationUiState.copy(
                                 isLoading = false,
                                 isError = true,
-//                                errorMessage = result.message
-                                errorMessage =  if (nisError == null && passwordError == null) message else null,
+                                errorMessage =  if (
+                                    nisError == null &&
+                                    passwordError == null &&
+                                    numberPhoneError == null &&
+                                    newPasswordError == null
+                                ) message else null,
                                 nisError = nisError,
-                                passwordError = passwordError
+                                passwordError = passwordError,
+                                newPasswordError = newPasswordError,
+                                generalError = numberPhoneError
                             )
                             Log.e("RegistrationViewModel", "activeAccount: ${result.message}")
                             onResult(false)
@@ -151,6 +166,7 @@ class RegistrationViewModel(
             }
         }
     }
+
 
     fun login(onResult: (Boolean) -> Unit) {
         val nis = loginstrationUiState.nis
@@ -178,7 +194,6 @@ class RegistrationViewModel(
                             _user.value = loginResponse.user
 
                             loginResponse.user.let {
-                        //                                _user.value = it
                                 dataStoreManager.saveUser(it)
                             }
 
@@ -202,7 +217,6 @@ class RegistrationViewModel(
                             loginstrationUiState = loginstrationUiState.copy(
                                 isLoading = false,
                                 isError = true,
-//                                errorMessage = result.message
                                 errorMessage = if (nisError == null && passError == null) message else null,
                                 nisError = nisError,
                                 passError = passError
@@ -326,6 +340,7 @@ data class RegistrationUiState(
     val errorMessage: String? = null,
     val nisError: String? = null,
     val passwordError: String? = null,
+    val newPasswordError: String? = null,
     val generalError: String? = null,
     val response: ActiveAccResponse? = null
 )

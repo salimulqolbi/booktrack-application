@@ -210,6 +210,7 @@ fun NumberTextField(
 @Composable
 fun PhoneNumberTextField(
     modifier: Modifier = Modifier,
+    errorText: String? = null,
     onValueChange: (String) -> Unit
 ) {
     val textValue = rememberSaveable { mutableStateOf("") }
@@ -266,6 +267,16 @@ fun PhoneNumberTextField(
                 modifier = Modifier.weight(1f) // Agar input bisa melebar
             )
         }
+    }
+
+    if (!errorText.isNullOrEmpty()) {
+        Text(
+            text = errorText,
+            color = Color.Red,
+            fontSize = 10.sp,
+            fontFamily = ManropeFamily,
+            modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+        )
     }
 }
 
