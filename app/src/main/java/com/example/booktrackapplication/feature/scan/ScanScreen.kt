@@ -100,8 +100,8 @@ fun ScanScreen(
             },
             onConfirm = {
                 viewModel.addBook(scannedBook)
-                viewModel.reset()
                 navController.navigate("list")
+                viewModel.reset()
             }
         )
     }
@@ -144,7 +144,7 @@ fun ScanScreen(
                                             if (value != null) {
                                                 isScanning = false
                                                 onBarcodeScanned(value)
-                                                break // ✅ ini aman karena bukan dalam lambda
+                                                break
                                             }
                                         }
 

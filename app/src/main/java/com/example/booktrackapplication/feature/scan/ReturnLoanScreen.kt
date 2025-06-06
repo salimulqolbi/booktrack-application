@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -62,7 +63,8 @@ fun ReturnLoanScreen(
     navController: NavController,
     viewModel: MainViewmodel = koinViewModel()
 ) {
-    val books = viewModel.loanedBooks
+//    val books = viewModel.loanedBooks
+    val books = viewModel.returnLoanedBooks
 
     val returnUiState by viewModel.returnUiState.collectAsStateWithLifecycle()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -81,6 +83,7 @@ fun ReturnLoanScreen(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
             .padding(top = 24.dp),
         topBar = {
             Box(
@@ -142,7 +145,7 @@ fun ReturnLoanScreen(
                             BookItem(
                                 book = book,
                                 onDeleteClick = {
-                                    viewModel.removeBook(book.code)
+                                    viewModel.removeBookReturn(book.code)
                                 }
                             )
                         }
@@ -215,7 +218,7 @@ fun ReturnLoanScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos ,
                             contentDescription = null,
-                            tint = Color(0xffFFFFFF),
+                            tint = Color(0xff2846CF),
                             modifier = Modifier.size(16.dp)
                         )
                     }

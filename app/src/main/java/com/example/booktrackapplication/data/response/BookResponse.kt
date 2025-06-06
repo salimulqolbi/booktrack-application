@@ -22,7 +22,8 @@ data class BookData(
     @SerialName("cover_url") val coverUrl: String,
     @SerialName("borrowed_by") val borrowedBy: BorrowerInfo? = null,
     @SerialName("created_at") val createdAt: String,
-    @SerialName("updated_at") val updatedAt: String
+    @SerialName("updated_at") val updatedAt: String,
+    val isSubmitted: Boolean = false
 )
 
 @Serializable

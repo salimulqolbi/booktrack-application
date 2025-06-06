@@ -26,15 +26,11 @@ interface MainRepository {
 
     suspend fun scanBookBarcode(code: String): Resource<BookResponse>
 
-    suspend fun getSchedule(): Resource<EventsScheduleResponse>
-
     suspend fun submitBorrowedBook(bookCodes: BookLoanRequest): Resource<BorrowBooksResponse>
 
     suspend fun getActivity(): Resource<ActivityResponse>
 
     suspend fun getHistory(): Resource<HistoryResponse>
-
-    suspend fun validateReturningDate(): Resource<ValidateReturningDateResponse>
 
     suspend fun submitReturnedBook(bookCodes: BookReturnRequest): Resource<ReturnBooksResponse>
 

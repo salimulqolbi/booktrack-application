@@ -212,27 +212,6 @@ class MainApiService (
         }
     }
 
-    suspend fun validateReturningDate(token: String): ValidateReturningDateResponse {
-        return withContext(Dispatchers.IO) {
-            try{
-                val response: HttpResponse = client.get {
-                    url("$baseUrl/events/validate-returning-date")
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $token")
-                        append(HttpHeaders.Accept, "application/json")
-                    }
-                }
-
-                val body = response.bodyAsText()
-                Log.d("BorrowApi", "validateReturningDate: $body")
-                response.body()
-            } catch (e: Exception) {
-                Log.e("ReturnApi", "Error validateReturningDate: ${e.message}")
-                throw e
-            }
-        }
-    }
-
     suspend fun submitReturnedBook(bookCodes: BookReturnRequest, token: String): ReturnBooksResponse {
         return withContext(Dispatchers.IO) {
             try {

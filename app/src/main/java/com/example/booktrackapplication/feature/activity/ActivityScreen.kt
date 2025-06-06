@@ -57,7 +57,7 @@ fun ActivityScreen(
     ) {
 
         Text(
-            "Aktifitas",
+            "Aktivitas",
             fontFamily = ManropeFamily,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,

@@ -292,46 +292,6 @@ class MainViewmodel(
         errorMessage = null
     }
 
-    fun getSchedule(onSuccess: () -> Unit = {}, onError: (String) -> Unit = {}) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
-            try {
-                when (val result = mainRepository.getSchedule()) {
-                    is Resource.Success -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                schedules = result.data?.data ?: emptyList()
-                            )
-                        }
-                        onSuccess()
-                    }
-
-                    is Resource.Error -> {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = result.message
-                            )
-                        }
-                        onError(result.message)
-                    }
-                    else -> Unit
-                }
-            } catch (e: Exception) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = e.message
-                    )
-                }
-                onError(e.message ?: "Terjadi exception")
-            }
-        }
-    }
-
-
     fun addBook(book: BookData, isSubmitted: Boolean = false) {
         Log.d("addBook", "Menambahkan: ${book.title}")
         if (_loanedBooks.none { it.code == book.code }) {
@@ -643,50 +603,6 @@ class MainViewmodel(
     fun clearSubmitMessage() {
         _returnUiState.update {
             it.copy(submitMessage = null)
-        }
-    }
-
-    fun validateRetuningDate() {
-        viewModelScope.launch {
-            _returnUiState.update {
-                it.copy(
-                    isLoading = true,
-                    errorMessage = null,
-                    isSuccess = false
-                )
-            }
-
-            when (val dataResult = mainRepository.validateReturningDate()) {
-                is Resource.Success -> {
-                    if (!dataResult.data.valid) {
-                        _returnUiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = dataResult.data.message
-                            )
-                        }
-                    } else {
-                        _returnUiState.update {
-                            it.copy(
-                                isLoading = false,
-                                eventId = dataResult.data.eventId,
-                                isSuccess = true
-                            )
-                        }
-                    }
-                }
-
-                is Resource.Error -> {
-                    _returnUiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = dataResult.message
-                        )
-                    }
-                }
-
-                else -> Unit
-            }
         }
     }
 

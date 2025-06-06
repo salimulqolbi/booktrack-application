@@ -22,9 +22,16 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
@@ -32,11 +39,14 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.example.booktrackapplication.utils.ConfirmBookDialog
+import com.example.booktrackapplication.utils.FailedNotification
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
@@ -52,15 +62,6 @@ fun ReturnScanScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val isValidationStarted = rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        if(!isValidationStarted.value) {
-            isValidationStarted.value = true
-            viewmodel.validateRetuningDate()
-        }
-    }
-
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage = viewmodel.errorMessageState.value
 
@@ -74,6 +75,8 @@ fun ReturnScanScreen(
     val cameraPermission = Manifest.permission.CAMERA
 
     var hasPermission by remember { mutableStateOf(false) }
+    val scanner = remember { BarcodeScanning.getClient() }
+    var canScan by remember { mutableStateOf(true) }
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -99,7 +102,7 @@ fun ReturnScanScreen(
             book = scannedBook,
             onDismiss = { viewmodel.reset() },
             onConfirm = {
-                viewmodel.addBook(scannedBook)
+                viewmodel.addBookReturn(scannedBook)
                 viewmodel.reset()
                 navController.navigate("return_list_book")
             }
@@ -111,7 +114,7 @@ fun ReturnScanScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+//        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -134,12 +137,10 @@ fun ReturnScanScreen(
                                 it.surfaceProvider = previewView.surfaceProvider
                             }
 
-                            val scanner = BarcodeScanning.getClient()
-
                             val analysis = ImageAnalysis.Builder().build().also {
                                 it.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
                                     val mediaImage = imageProxy.image
-                                    if (mediaImage != null) {
+                                    if (mediaImage != null && canScan) {
                                         val inputImage = InputImage.fromMediaImage(
                                             mediaImage,
                                             imageProxy.imageInfo.rotationDegrees
@@ -148,12 +149,20 @@ fun ReturnScanScreen(
                                         scanner.process(inputImage)
                                             .addOnSuccessListener { code ->
                                                 for (code in code) {
-                                                    code.rawValue?.let { value ->
+                                                    val value = code.rawValue
+                                                    if (value != null) {
+                                                        canScan = false
                                                         onBarcodeScanned(value)
-                                                        scanner.close()
-                                                        imageProxy.close()
-                                                        return@addOnSuccessListener
+                                                        break
                                                     }
+//                                                    code.rawValue?.let { value ->
+//                                                        canScan = false
+//                                                        onBarcodeScanned(value)
+//                                                        break
+////                                                        scanner.close()
+////                                                        imageProxy.close()
+////                                                        return@addOnSuccessListener
+//                                                    }
                                                 }
                                                 imageProxy.close()
                                             }
@@ -182,8 +191,24 @@ fun ReturnScanScreen(
                         }, ContextCompat.getMainExecutor(context))
                     }
                 }
+
+                AnimatedVisibility(
+                    visible = errorMessage != null,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically(),
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 32.dp)
+                ) {
+                    FailedNotification(
+                        message = errorMessage ?: "",
+                        onDismiss = {
+                            viewmodel.clearErrorMessage()
+                            canScan = true
+                        }
+                    )
+                }
             }
         }
     )
-
 }

@@ -74,21 +74,6 @@ class MainRepositoryImpl(
         }
     }
 
-    override suspend fun getSchedule(): Resource<EventsScheduleResponse> {
-        return try {
-            val token = dataStoreManager.getToken() ?: return Resource.Error("TOken tidak ditemukan")
-            Log.d("SCHEDULE", "Token: $token")
-            if (token == null) {
-                Resource.Error("Token not found")
-            } else {
-                val result = apiService.getSchedule(token)
-                Resource.Success(result)
-            }
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "Unexpected error")
-        }
-    }
-
     override suspend fun submitBorrowedBook(
         bookCodes: BookLoanRequest
     ): Resource<BorrowBooksResponse> {
@@ -122,16 +107,6 @@ class MainRepositoryImpl(
             Resource.Success(result)
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Gagal mendapatkan riwayat")
-        }
-    }
-
-    override suspend fun validateReturningDate(): Resource<ValidateReturningDateResponse> {
-        return try {
-            val token = dataStoreManager.getToken() ?: return Resource.Error("Token not found")
-            val response = apiService.validateReturningDate(token)
-            Resource.Success(response)
-        } catch (e: Exception) {
-            Resource.Error(e.message ?: "Error validating returning date")
         }
     }
 

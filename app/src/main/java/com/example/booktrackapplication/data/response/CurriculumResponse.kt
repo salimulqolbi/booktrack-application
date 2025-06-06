@@ -14,9 +14,10 @@ data class CurriculumResponse(
 data class Curriculum(
     val id: Int,
     val grade: String,
+    val department: Department,
     val semester: String,
     @SerialName("book_count") val bookCount: Int,
-    val department: Department
+    @SerialName("book_borrow_quota") val bookBorrowQuota: Int
 )
 
 @Serializable
