@@ -133,6 +133,7 @@ class RegistrationViewModel(
                                 message.contains("phone", true) || message.contains("number", true)
                             ) message else null
                             val newPasswordError = if (message.contains("new password", true)) message else null
+                            val isAccountAlreadyActive = message.contains("akun sudah aktif", ignoreCase = true)
 
                             registrationUiState = registrationUiState.copy(
                                 isLoading = false,
@@ -141,13 +142,22 @@ class RegistrationViewModel(
                                     nisError == null &&
                                     passwordError == null &&
                                     numberPhoneError == null &&
-                                    newPasswordError == null
+                                    newPasswordError == null &&
+                                    !isAccountAlreadyActive
                                 ) message else null,
                                 nisError = nisError,
                                 passwordError = passwordError,
                                 newPasswordError = newPasswordError,
                                 generalError = numberPhoneError
                             )
+
+                            if (isAccountAlreadyActive) {
+                                // Munculkan dialog khusus di UI menggunakan flag khusus
+                                registrationUiState = registrationUiState.copy(
+                                    errorMessage = "Akun sudah aktif"
+                                )
+                            }
+
                             Log.e("RegistrationViewModel", "activeAccount: ${result.message}")
                             onResult(false)
                         }
@@ -210,14 +220,15 @@ class RegistrationViewModel(
 
                         is Resource.Error -> {
                             val message = result.message ?: "Terjadi kesalahan"
-
-                            val nisError = if (message.contains("nis", true)) message else null
-                            val passError = if (message.contains("password", true)) message else null
+                            val showDialog = message.contains("belum diaktivasi", true)
+                            val errorMessage = if (showDialog) message else null
+                            val nisError = if (!showDialog && message.contains("nis", true)) message else null
+                            val passError = if (!showDialog && message.contains("password", true)) message else null
 
                             loginstrationUiState = loginstrationUiState.copy(
                                 isLoading = false,
                                 isError = true,
-                                errorMessage = if (nisError == null && passError == null) message else null,
+                                errorMessage = errorMessage,
                                 nisError = nisError,
                                 passError = passError
                             )
@@ -321,6 +332,13 @@ class RegistrationViewModel(
 
     fun clearError() {
         registrationUiState = registrationUiState.copy(
+            isError = false,
+            errorMessage = null
+        )
+    }
+
+    fun clearLoginError() {
+        loginstrationUiState = loginstrationUiState.copy(
             isError = false,
             errorMessage = null
         )

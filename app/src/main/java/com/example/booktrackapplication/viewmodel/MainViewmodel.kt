@@ -8,12 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.booktrack.data.repository.auth.AuthRepository
 import com.example.booktrack.data.repository.main.MainRepository
 import com.example.booktrack.data.response.BookData
+import com.example.booktrack.data.response.BorrowStatusResponse
 import com.example.booktrack.data.response.Curriculum
 import com.example.booktrack.data.response.ScheduleItem
-import com.example.booktrack.data.response.UserResponse
 import com.example.booktrack.utils.Resource
 import com.example.booktrackapplication.data.datastore.DataStoreManager
 import com.example.booktrackapplication.data.response.ActivityItem
@@ -21,8 +20,6 @@ import com.example.booktrackapplication.data.response.BookLoanRequest
 import com.example.booktrackapplication.data.response.BookReturnRequest
 import com.example.booktrackapplication.data.response.BorrowBooksResponse
 import com.example.booktrackapplication.data.response.HistoryGroup
-//import com.example.booktrackapplication.data.response.HistoryGroup
-import com.example.booktrackapplication.data.response.HistoryItem
 import com.example.booktrackapplication.data.response.ProfileResponse
 import com.example.booktrackapplication.data.response.ReturnBooksResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,14 +44,14 @@ class MainViewmodel(
     private val _loanedBooks = mutableStateListOf<BookData>()
     val loanedBooks: List<BookData> = _loanedBooks
 
+    private val _returnLoanedBooks = mutableStateListOf<BookData>()
+    val returnLoanedBooks: List<BookData> = _returnLoanedBooks
+
     private val _searchHistory = mutableStateListOf<String>()
     val searchHistory: List<String> get() = _searchHistory
 
     private val _errorMessageState = mutableStateOf<String?>(null)
     val errorMessageState: State<String?> = _errorMessageState
-
-//    private val _activityState = mutableStateListOf<ActivityItem>()
-//    val activityState: List<ActivityItem> = _activityState
 
     private val _activityUiState = MutableStateFlow(ActivityUiState())
     val activityUiState: StateFlow<ActivityUiState> = _activityUiState.asStateFlow()
@@ -74,16 +71,6 @@ class MainViewmodel(
     var searchedBook by mutableStateOf<BookData?>(null)
         private set
 
-    var submitResult by mutableStateOf<String?>(null)
-        private set
-
-    var notFoundBooks = mutableStateListOf<String>()
-        private set
-
-    var unavailableBooks = mutableStateListOf<String>()
-        private set
-
-
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
 
@@ -93,14 +80,42 @@ class MainViewmodel(
 
             when (val borrowResult = mainRepository.checkBorrowStatus()) {
                 is Resource.Success -> {
-                    if (!borrowResult.data.canBorrow) {
+//                    val borrowData = borrowResult.data
+//                    if (borrowData.currentBorrowed != null && borrowData.borrowQuota != null) {
+//                        if (borrowData.currentBorrowed >= borrowData.borrowQuota) {
+//                            _uiState.update {
+//                                it.copy(
+//                                    isLoading = false,
+//                                    errorMessage = borrowData.message
+//                                )
+//                            }
+//                            return@launch
+//                        }
+//                    }
+
+//                    if (!borrowResult.data.canBorrow) {
+//                        _uiState.update {
+//                            it.copy(
+//                                isLoading = false,
+//                                errorMessage = borrowResult.data.message
+//                            )
+//                        }
+//                        return@launch
+//                    }
+                    val borrowData = borrowResult.data
+
+                    if (!borrowData.canBorrow) {
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
-                                errorMessage = borrowResult.data.message
+                                errorMessage = borrowData.message,
+                                currentBorrowed = borrowData
                             )
                         }
                         return@launch
+                    }
+                    _uiState.update {
+                        it.copy(currentBorrowed = borrowData)
                     }
                 }
 
@@ -112,37 +127,6 @@ class MainViewmodel(
                         )
                     }
                     return@launch
-                }
-
-                else -> Unit
-            }
-
-            when (val dataResult = mainRepository.validateBorrowingDate()) {
-                is Resource.Success -> {
-                    if (!dataResult.data.valid) {
-                        _uiState.update {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = dataResult.data.message
-                            )
-                        }
-                        return@launch
-                    } else {
-                        _uiState.update {
-                            it.copy(
-                                eventId = dataResult.data.eventId
-                            )
-                        }
-                    }
-                }
-
-                is Resource.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            errorMessage = dataResult.message
-                        )
-                    }
                 }
 
                 else -> Unit
@@ -185,12 +169,29 @@ class MainViewmodel(
     }
 
     fun clearSuccessFlag() {
-        _uiState.update { it.copy(isSuccess = false) }
-        _returnUiState.update { it.copy(isSuccess = false) }
+//        _uiState.update { it.copy(isSuccess = false) }
+//        _returnUiState.update { it.copy(isSuccess = false) }
+        _uiState.update {
+            it.copy(
+                isSuccess = false,
+                submitMessage = null
+            )
+        }
+        _returnUiState.update {
+            it.copy(
+                isSuccess = false,
+                submitMessage = null
+            )
+        }
     }
 
     fun clearError() {
-        _uiState.update { it.copy(errorMessage = null) }
+        _uiState.update {
+            it.copy(
+                errorMessage = null,
+                unavailableBooks = emptyList()
+            )
+        }
         _returnUiState.update { it.copy(errorMessage = null) }
     }
 
@@ -244,7 +245,6 @@ class MainViewmodel(
         _searchBook.value = null
     }
 
-
     fun fetchReturnBook(code: String) {
         viewModelScope.launch {
             isLoading = true
@@ -280,7 +280,8 @@ class MainViewmodel(
 
     fun resetReturnBook() {
         scannedBook = null
-        _loanedBooks.clear()
+//        _loanedBooks.clear()
+        _returnLoanedBooks.clear()
         _errorMessageState.value = null
         errorMessage = null
     }
@@ -331,20 +332,37 @@ class MainViewmodel(
     }
 
 
-    fun addBook(book: BookData) {
+    fun addBook(book: BookData, isSubmitted: Boolean = false) {
         Log.d("addBook", "Menambahkan: ${book.title}")
         if (_loanedBooks.none { it.code == book.code }) {
-            _loanedBooks.add(book)
+            _loanedBooks.add(book.copy(isSubmitted = isSubmitted))
             Log.d("addBook", "Sekarang jumlah buku: ${_loanedBooks.size}")
         }
     }
 
+    fun addBookReturn(book: BookData) {
+        Log.d("addBook", "Menambahkan: ${book.title}")
+        Log.d("addBook", "Menambahkan: ${book.code}")
+        if (_returnLoanedBooks.none { it.code == book.code }) {
+            _returnLoanedBooks.add(book)
+            Log.d("addBook", "Sekarang jumlah buku: ${_returnLoanedBooks.size}")
+        }
+    }
+
     fun removeBook(code: String) {
-        _loanedBooks.removeIf { it.code == code }
+        _loanedBooks.removeIf { it.code == code && !it.isSubmitted }
+    }
+
+    fun removeBookReturn(code: String) {
+        _returnLoanedBooks.removeIf { it.code == code }
     }
 
     fun resetBook() {
         _loanedBooks.clear()
+    }
+
+    fun resetBookReturn() {
+        _returnLoanedBooks.clear()
     }
 
     fun addToSearchHistory(query: String) {
@@ -361,6 +379,141 @@ class MainViewmodel(
         _searchHistory.clear()
     }
 
+//    fun submitBorrowedBooks(onFinish: (Boolean) -> Unit = {}) {
+//        viewModelScope.launch {
+//            _uiState.update {
+//                it.copy(
+//                    isLoading = true,
+//                    errorMessage = null,
+//                    notFoundBooks = emptyList(),
+//                    unavailableBooks = emptyList()
+//                )
+//            }
+//            val bookCodes = loanedBooks
+//                .filter { !it.isSubmitted }
+//                .map { it.code }
+//            val request = BookLoanRequest(bookCodes)
+//
+//            when (val result = mainRepository.submitBorrowedBook(request)) {
+//                is Resource.Success -> {
+//                    Log.d("ViewModel", "Submit returned books success: ${result.data.message}")
+//                    _uiState.update {
+//                        it.copy(
+//                            isLoading = false,
+//                            submitMessage = result.data.message,
+//                            isSuccess = true
+//                        )
+//                    }
+//                    _loanedBooks.replaceAll { book ->
+//                        if (!book.isSubmitted) book.copy(isSubmitted = true) else book
+//                    }
+//                    resetBook()
+//                    onFinish(true)
+//                }
+//
+//                is Resource.Error -> {
+//                    val fallbackMessage = result.data
+////                        ?: "Terjadi kesalahan saat submit"
+//                    Log.e("ViewModel", "Submit returned books error raw message: $fallbackMessage")
+//
+//                    var notFound = emptyList<String>()
+////                    var unavailable = emptyList<String>()
+//                    val unavailable = fallbackMessage?.errors?.unavailableBooks ?: emptyList()
+////                    var message = fallbackMessage
+//                    var message = result.message ?: "Terjadi kesalahan saat submit"
+//
+////                    val response = result.data
+////                    val notFound = response?.errors?.notFoundCodes.orEmpty()
+////                    val unavailable = response?.errors?.unavailableBooks.orEmpty()
+////                    val message = response?.message ?: result.message ?: "Terjadi kesalahan saat submit"
+//
+////                    try {
+////                        val parsed = Json.decodeFromString<BorrowBooksResponse>(fallbackMessage)
+////                        notFound = parsed.errors?.notFoundCodes ?: emptyList()
+////                        unavailable = parsed.errors?.unavailableBooks ?: emptyList()
+////                        message = parsed.message
+//////
+//////                        val fullMessage = buildString {
+//////                            append(message)
+//////                            if (unavailable.isNotEmpty()) {
+//////                                append("\n\nBuku sedang dipinjam:\n")
+//////                                unavailable.forEach { append("- $it\n") }
+//////                            }
+//////                        }
+////                    Log.d("ViewModel", "Parsed error response: message='$message', notFound=$notFound, unavailable=$unavailable")
+////                } catch (e: Exception) {
+////                    Log.e("ViewModel", "Failed to parse error response: ${e.message}")
+////                }
+//
+////                    val unavailableList = unavailable.joinToString("\n") { "- $it" }
+////                    message = buildString {
+////                        append(parsed.message)
+////                        if (unavailableList.isNotEmpty()) {
+////                            append("\n\nBuku yang sedang dipinjam:\n")
+////                            append(unavailableList)
+////                        }
+////                    }
+//
+//                    val fullErrorMessage = buildString {
+//                        append(message)
+//                        if (unavailable.isNotEmpty()) {
+//                            append("\n\nBuku yang sedang dipinjam:\n")
+//                            unavailable.forEach { append("- $it\n") }
+//                        }
+//                    }
+//                    Log.d("ViewModel", "Full error message to show:\n$fullErrorMessage")
+//
+//                    _uiState.update {
+//                        it.copy(
+//                            isLoading = false,
+//                            errorMessage = message,
+//                            notFoundBooks = notFound,
+//                            unavailableBooks = unavailable
+//                        )
+//                    }
+//
+////                    val errorData = result.data
+////                    if (errorData != null) {
+////                        val notFound = errorData.errors?.notFoundCodes ?: emptyList()
+////                        val unavailable = errorData.errors?.unavailableBooks ?: emptyList()
+////                        val message = errorData.message
+////
+////                        val fullErrorMessage = buildString {
+////                            append(message)
+////                            if (unavailable.isNotEmpty()) {
+////                                append("\n\nBuku yang sedang dipinjam:\n")
+////                                unavailable.forEach { append("- $it\n") }
+////                            }
+////                            if (notFound.isNotEmpty()) {
+////                                append("\nBuku tidak ditemukan:\n")
+////                                notFound.forEach { append("- $it\n") }
+////                            }
+////                        }
+////
+////                        _returnUiState.update {
+////                            it.copy(
+////                                isLoading = false,
+////                                errorMessage = fullErrorMessage.trim(),
+////                                notFoundBooks = notFound,
+////                                unavailableBooks = unavailable
+////                            )
+////                        }
+////                    } else {
+////                        // fallback kalau data error null, pakai pesan biasa
+////                        _returnUiState.update {
+////                            it.copy(
+////                                isLoading = false,
+////                                errorMessage = result.message ?: "Terjadi kesalahan saat pengembalian"
+////                            )
+////                        }
+////                    }
+//
+//                    onFinish(false)
+//                }
+//            }
+//        }
+//    }
+
     fun submitBorrowedBooks(onFinish: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _uiState.update {
@@ -371,8 +524,9 @@ class MainViewmodel(
                     unavailableBooks = emptyList()
                 )
             }
-
-            val bookCodes = loanedBooks.map { it.code }
+            val bookCodes = loanedBooks
+                .filter { !it.isSubmitted }
+                .map { it.code }
             val request = BookLoanRequest(bookCodes)
 
             when (val result = mainRepository.submitBorrowedBook(request)) {
@@ -384,23 +538,36 @@ class MainViewmodel(
                             isSuccess = true
                         )
                     }
+                    _loanedBooks.replaceAll { book ->
+                        if (!book.isSubmitted) book.copy(isSubmitted = true) else book
+                    }
                     resetBook()
                     onFinish(true)
                 }
 
                 is Resource.Error -> {
-                    // Coba parsing error
-                    val fallbackMessage = result.message ?: "Terjadi kesalahan saat submit"
+                    Log.e("SubmitReturn", "Raw error message: ${result.message}")
+
                     var notFound = emptyList<String>()
                     var unavailable = emptyList<String>()
-                    var message = fallbackMessage
+                    var message = result.message ?: "Terjadi kesalahan saat pengembalian"
 
-                    try {
-                        val parsed = Json.decodeFromString<BorrowBooksResponse>(fallbackMessage)
-                        notFound = parsed.errors?.notFoundCodes ?: emptyList()
-                        unavailable = parsed.errors?.unavailableBooks ?: emptyList()
-                        message = parsed.message
-                    } catch (_: Exception) {}
+//                    if (message.trim().startsWith("{")) {
+//                        try {
+//                            val parsed = Json.decodeFromString<BorrowBooksResponse>(message)
+//                            notFound = parsed.errors?.notFoundCodes ?: emptyList()
+//                            unavailable = parsed.errors?.unavailableBooks ?: emptyList()
+//                            message = parsed.message
+//                        } catch (e: Exception) {
+//                            Log.e("SubmitReturn", "Gagal parsing JSON: ${e.message}")
+//                        }
+//                    }
+
+                    result.data?.let { response ->
+                        notFound = response.errors?.notFoundCodes ?: emptyList()
+                        unavailable = response.errors?.unavailableBooks ?: emptyList()
+                        message = response.message
+                    }
 
                     _uiState.update {
                         it.copy(
@@ -417,6 +584,7 @@ class MainViewmodel(
         }
     }
 
+
     fun submitReturnedBooks(onFinish: (Boolean) -> Unit = {}) {
         viewModelScope.launch {
             _returnUiState.update {
@@ -428,7 +596,7 @@ class MainViewmodel(
                 )
             }
 
-            val request = BookReturnRequest(bookCodes = loanedBooks.map { it.code })
+            val request = BookReturnRequest(bookCodes = returnLoanedBooks.map { it.code })
 
             when (val result = mainRepository.submitReturnedBook(request)) {
                 is Resource.Success -> {
@@ -439,7 +607,8 @@ class MainViewmodel(
                             isSuccess = true
                         )
                     }
-                    resetBook()
+//                    resetBook()
+                    resetBookReturn()
                     onFinish(true)
                 }
 
@@ -454,7 +623,7 @@ class MainViewmodel(
                         notFound = parsed.errors?.notFoundCodes ?: emptyList()
                         unavailable = parsed.errors?.unavailableBooks ?: emptyList()
                         message = parsed.message
-                    } catch (_: Exception) {}
+                    } catch (e: Exception) {}
 
                     _returnUiState.update {
                         it.copy(
@@ -501,7 +670,7 @@ class MainViewmodel(
                             it.copy(
                                 isLoading = false,
                                 eventId = dataResult.data.eventId,
-                                isSuccess = true // ✅ Tambahkan ini
+                                isSuccess = true
                             )
                         }
                     }
@@ -622,6 +791,7 @@ data class BorrowUiState(
     val errorMessage: String? = null,
     val isSuccess: Boolean = false,
     val curriculum: Curriculum? = null,
+    val currentBorrowed: BorrowStatusResponse? = null,
     val eventId: Int? = null,
     val schedules: List<ScheduleItem> = emptyList(),
     val submitMessage: String? = null,
@@ -642,7 +812,6 @@ data class HistoryUiState(
     val errorMessage: String? = null,
     val emptyMessage: String? = null
 )
-
 
 data class ReturnUiState(
     val isLoading: Boolean = false,

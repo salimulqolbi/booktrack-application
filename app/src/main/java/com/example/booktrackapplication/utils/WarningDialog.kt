@@ -1,6 +1,7 @@
 package com.example.booktrackapplication.utils
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -37,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -369,7 +372,8 @@ fun ScanWarningDialog(
                 Spacer(modifier = Modifier.height(12.dp))
                 Button(
                     onClick = {
-                        viewModel.validateRetuningDate()
+//                        viewModel.validateRetuningDate()
+                        navController.navigate("scan_return_code")
                     },
                     border = BorderStroke(1.dp, Color(0xffE1E1E1)),
                     shape = RoundedCornerShape(28.dp),
@@ -666,9 +670,230 @@ fun LoginWarning(
     }
 }
 
+@Composable
+fun LoginWarningDialog(
+    onDismissRequest: () -> Unit,
+    message: String,
+    navController: NavController
+) {
+    Dialog(
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .padding(horizontal = 28.dp)
+                .fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Card(
+                        shape = CircleShape,
+                        backgroundColor = Color(0XFFF7F8FC),
+                        border = BorderStroke(1.dp, Color(0xffEBEBEB)),
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clickable { onDismissRequest() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color(0xff2846CF),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun DialogPrev() {
-//    LogoutWarning {  }
-//}
+                Image(
+                    painter = painterResource(id = R.drawable.alert_circle),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(72.dp)
+                )
+
+                Text(
+                    message,
+                    fontSize = 16.sp,
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                    )
+                )
+
+                Text(
+                    "Silahkan aktivasi akun terlebih dahulu",
+                    fontSize = 12.sp,
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(
+                        top = 8.dp,
+                    )
+                )
+
+                Button(
+                    onClick = {
+                        onDismissRequest()
+                        navController.navigate("register") {
+                            launchSingleTop = true
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 20.dp,
+                            start = 24.dp,
+                            end = 24.dp,
+                            bottom = 20.dp
+                        ),
+                    shape = CircleShape,
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = Color(
+                            0xFF2846CF
+                        )
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.aktivasi),
+                        fontSize = 12.sp,
+                        color = Color(0xffFFFFFF),
+                        fontFamily = ManropeFamily,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RegisterWarningDialog(
+    onDismissRequest: () -> Unit,
+    message: String,
+    navController: NavController
+) {
+    Dialog(
+        onDismissRequest = { onDismissRequest() }
+    ) {
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .padding(horizontal = 28.dp)
+                .fillMaxWidth(),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Card(
+                        shape = CircleShape,
+                        backgroundColor = Color(0XFFF7F8FC),
+                        border = BorderStroke(1.dp, Color(0xffEBEBEB)),
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clickable { onDismissRequest() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            tint = Color(0xff2846CF),
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    }
+                }
+
+                Image(
+                    painter = painterResource(id = R.drawable.alert_circle),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(72.dp)
+                )
+
+                Text(
+                    message,
+                    fontSize = 16.sp,
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                    )
+                )
+
+                Text(
+                    "Silahkan login untuk melanjutkan",
+                    fontSize = 12.sp,
+                    fontFamily = ManropeFamily,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 14.sp,
+                    modifier = Modifier.padding(
+                        top = 8.dp,
+                    )
+                )
+
+                Button(
+                    onClick = {
+                        onDismissRequest()
+                        navController.navigate("login") {
+                            launchSingleTop = true
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = 20.dp,
+                            start = 24.dp,
+                            end = 24.dp,
+                            bottom = 20.dp
+                        ),
+                    shape = CircleShape,
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = Color(
+                            0xFF2846CF
+                        )
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.login),
+                        fontSize = 12.sp,
+                        color = Color(0xffFFFFFF),
+                        fontFamily = ManropeFamily,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DialogPrev() {
+//    LoginWarning {  }
+//    RegisterWarningDialog(
+//        onDismissRequest = {},
+//        message = "Akun sudah aktif"
+//    )
+}

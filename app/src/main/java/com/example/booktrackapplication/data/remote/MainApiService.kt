@@ -162,7 +162,6 @@ class MainApiService (
             } catch (e: ClientRequestException) {
                 val errorBody = e.response.bodyAsText()
                 Log.e("LoanApi", "submitLoan (client error): $errorBody")
-                // biar error detail bisa diproses di repo / VM
                 Json.decodeFromString<BorrowBooksResponse>(errorBody)
             } catch (e: Exception) {
                 Log.e("LoanApi", "submitLoan error: ${e.message}")
@@ -252,7 +251,6 @@ class MainApiService (
             } catch (e: ClientRequestException) {
                 val errorBody = e.response.bodyAsText()
                 Log.e("return", "returnBook (client error): $errorBody")
-                // biar error detail bisa diproses di repo / VM
                 Json.decodeFromString<ReturnBooksResponse>(errorBody)
             } catch (e: Exception) {
                 Log.e("return", "returnBook error: ${e.message}")

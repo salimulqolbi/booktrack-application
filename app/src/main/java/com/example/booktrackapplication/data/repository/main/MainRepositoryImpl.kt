@@ -20,6 +20,7 @@ import com.example.booktrackapplication.data.response.ReturnBooksResponse
 import com.example.booktrackapplication.data.response.ValidateReturningDateResponse
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
+import kotlinx.serialization.json.Json
 import java.lang.Error
 
 class MainRepositoryImpl(
@@ -141,7 +142,9 @@ class MainRepositoryImpl(
             if(result.success) {
                 Resource.Success(result)
             } else {
-                Resource.Error(result.message)
+//                Resource.Error(result.message)
+//                val json = Json.encodeToString(result)
+                Resource.Error(result.message, result)
             }
         } catch (e: Exception) {
             Resource.Error(e.message ?: "Gagal melakukan pengembalian")

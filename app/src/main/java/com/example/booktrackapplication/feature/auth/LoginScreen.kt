@@ -1,5 +1,6 @@
 package com.example.booktrack.feature.login
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +49,7 @@ import com.example.booktrack.utils.ProfileNumberField
 import com.example.booktrackapplication.R
 import com.example.booktrackapplication.ui.theme.ManropeFamily
 import com.example.booktrackapplication.utils.LoginWarning
+import com.example.booktrackapplication.utils.LoginWarningDialog
 import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -63,6 +65,21 @@ fun LoginScreen(
 
     val state = viewModel.loginstrationUiState
     val context = LocalContext.current
+
+    Log.d("LoginScreen", "Error message state: ${state.errorMessage}")
+
+    val showDialog = state.errorMessage?.contains("Akun belum diaktivasi", ignoreCase = true) == true
+
+    if (showDialog) {
+        LoginWarningDialog(
+            message = state.errorMessage!!,
+            onDismissRequest = {
+                viewModel.clearLoginError()
+            },
+            navController = navController
+
+        )
+    }
 
     Scaffold(
         modifier = Modifier
@@ -133,8 +150,7 @@ fun LoginScreen(
 
                     //NIS
                     Column(
-                        horizontalAlignment = Alignment.Start,
-//                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalAlignment = Alignment.Start
                     ) {
                         Text(
                             text = stringResource(R.string.nomor_identitas),
@@ -240,9 +256,6 @@ fun LoginScreen(
             ) {
                 ActivationText {
                     navController.navigate("register") {
-//                        popUpTo("login") {
-//                            inclusive = true
-//                        }
                         launchSingleTop = true
                     }
                 }

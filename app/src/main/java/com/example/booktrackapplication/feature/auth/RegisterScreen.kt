@@ -40,6 +40,7 @@ import com.example.booktrack.utils.PasswordTextField
 import com.example.booktrack.utils.PhoneNumberTextField
 import com.example.booktrackapplication.R
 import com.example.booktrackapplication.ui.theme.ManropeFamily
+import com.example.booktrackapplication.utils.RegisterWarningDialog
 import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -53,6 +54,18 @@ fun RegistrationScreen(
 
     BackHandler {
         navController.popBackStack()
+    }
+
+    val showDialog = state.errorMessage?.contains("Akun sudah aktif", ignoreCase = true) == true
+
+    if(showDialog) {
+        RegisterWarningDialog(
+            message = state.errorMessage!!,
+            onDismissRequest = {
+                viewModel.clearError()
+            },
+            navController = navController
+        )
     }
 
     Scaffold(

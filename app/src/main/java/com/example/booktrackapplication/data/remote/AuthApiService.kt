@@ -26,6 +26,14 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
+
 
 class AuthApiService(
     private val client: HttpClient,
@@ -40,17 +48,16 @@ class AuthApiService(
                     setBody(request)
                 }
 
-                // Log response JSON sebelum parsing
                 val responseBody = response.bodyAsText()
                 Log.d("book", "Response Body: $responseBody")
 
                 if(!response.status.isSuccess()) {
-//                    val errorJson = Json.decodeFromString<ErrorResponse>(responseBody)
-                    val errorJson = Json {
-                        ignoreUnknownKeys = true
-                    }.decodeFromString<ErrorResponse>(responseBody)
-
-                    val errorMessage = errorJson.error ?: errorJson.message ?: "Terjadi kesalahan"
+                    val errorJson = Json.decodeFromString<ErrorResponse>(responseBody)
+                    val errorMessage = when {
+                        errorJson.error != null -> errorJson.error
+                        errorJson.message is JsonPrimitive -> errorJson.message.content
+                        else -> "Terjadi kesalahan"
+                    }
                     throw Exception(errorMessage)
                 }
 
@@ -77,11 +84,15 @@ class AuthApiService(
                 Log.d("book", "Response Body: $responseBody")
 
                 if(!response.status.isSuccess()) {
-//                    val errorJson = Json.decodeFromString<ErrorLoginResponse>(responseBody)
-//                    throw Exception(errorJson.message)
-
                     val errorJson = Json.decodeFromString<ErrorLoginResponse>(responseBody)
-                    val errorMessage = errorJson.message.entries.firstOrNull()?.value?.firstOrNull() ?: "Terjadi kesalahan"
+
+                    val errorMessage = when (val msg = errorJson.message) {
+                        is JsonPrimitive -> msg.content
+                        is JsonObject -> msg.entries.firstOrNull()?.value
+                            ?.jsonArray?.firstOrNull()?.jsonPrimitive?.content
+                            ?: "Terjadi kesalahan"
+                        else -> "Terjadi kesalahan"
+                    }
                     throw Exception(errorMessage)
                 }
                 Json.decodeFromString(responseBody)
@@ -108,7 +119,6 @@ class AuthApiService(
                 val responseBody = response.bodyAsText()
                 Log.d("book", "Logout response: $responseBody")
 
-                // Optional: bisa parse response ke model kalau perlu
                 if (!response.status.isSuccess()) {
                     throw Exception("Logout gagal: ${response.status}")
                 }

@@ -1,6 +1,7 @@
 package com.example.booktrack.data.response
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class LoginResponse(
@@ -11,5 +12,7 @@ data class LoginResponse(
 
 @Serializable
 data class ErrorLoginResponse(
-    val message: Map<String, List<String>>
+//    val message: Map<String, List<String>>
+//    val message: String
+    val message: JsonElement
 )

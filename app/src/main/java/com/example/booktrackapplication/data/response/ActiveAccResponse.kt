@@ -2,6 +2,7 @@ package com.example.booktrack.data.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class ActiveAccResponse(
@@ -27,6 +28,6 @@ data class ActiveUserResponse(
 
 @Serializable
 data class ErrorResponse(
-    val message: String,
+    val message: JsonElement,
     val error: String? = null
 )
