@@ -5,7 +5,6 @@ import com.example.booktrack.data.response.BookResponse
 import com.example.booktrack.data.response.BorrowStatusResponse
 import com.example.booktrack.data.response.CurriculumResponse
 import com.example.booktrack.data.response.EventsScheduleResponse
-import com.example.booktrack.data.response.UserResponse
 import com.example.booktrack.data.response.ValidateBorrowingDateResponse
 import com.example.booktrackapplication.data.response.ActivityResponse
 import com.example.booktrackapplication.data.response.BookLoanRequest
@@ -13,9 +12,7 @@ import com.example.booktrackapplication.data.response.BookReturnRequest
 import com.example.booktrackapplication.data.response.BorrowBooksResponse
 import com.example.booktrackapplication.data.response.GetUserResponse
 import com.example.booktrackapplication.data.response.HistoryResponse
-import com.example.booktrackapplication.data.response.ProfileResponse
 import com.example.booktrackapplication.data.response.ReturnBooksResponse
-import com.example.booktrackapplication.data.response.ValidateReturningDateResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.ClientRequestException
@@ -91,7 +88,6 @@ class MainApiService (
                 Log.d("BorrowApi", "getCurriculumByUser: $body")
                 response.body()
             } catch (e: ClientRequestException) {
-                // Kalau 404 Curriculum tidak ditemukan
                 val body = e.response.bodyAsText()
                 Log.e("BorrowApi", "404 Not Found: $body")
                 throw e
@@ -118,27 +114,6 @@ class MainApiService (
                 response.body()
             } catch (e: Exception) {
                 Log.e("ScanApi", "Error getBookByBarcode: ${e.message}")
-                throw e
-            }
-        }
-    }
-
-    suspend fun getSchedule(token: String): EventsScheduleResponse {
-        return withContext(Dispatchers.IO) {
-            try {
-                val response: HttpResponse = client.get {
-                    url("$baseUrl/events/active")
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $token")
-                        append(HttpHeaders.Accept, "application/json")
-                    }
-                }
-
-                val body = response.bodyAsText()
-                Log.d("ScheduleApi", "getSchedule: $body")
-                response.body()
-            } catch (e: Exception) {
-                Log.e("ScheduleApi", "Error getSchedule: ${e.message}")
                 throw e
             }
         }

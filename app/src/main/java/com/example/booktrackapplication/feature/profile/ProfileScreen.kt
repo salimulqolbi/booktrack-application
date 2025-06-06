@@ -3,7 +3,6 @@ package com.example.booktrack.feature.profile
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,21 +26,14 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.HeadsetMic
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.Logout
 import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -141,26 +133,6 @@ fun ProfileScreen(
                                 .border(1.dp, Color(0xffEBEBEB), CircleShape),
                             contentScale = ContentScale.Crop
                         )
-                        IconButton(
-                            onClick = {
-
-                            },
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clip(CircleShape)
-                                .border(1.dp, Color(0xffEBEBEB), CircleShape)
-                                .padding(0.5.dp),
-                            colors = IconButtonDefaults.iconButtonColors(
-                                containerColor = Color.White,
-                                contentColor = Color.Black
-                            )
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.edit),
-                                contentDescription = "Edit Profile",
-                                modifier = Modifier.size(12.dp)
-                            )
-                        }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(

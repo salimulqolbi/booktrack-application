@@ -59,17 +59,6 @@ fun ScheduleList(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.getSchedule(
-            onSuccess = {
-                Log.d("Schedule", "Data berhasil diambil")
-            },
-            onError = {
-                Log.e("Schedule", "Gagal ambil data: $it")
-            }
-        )
-    }
-
     val schedules = state.schedules
     val jurusanList = schedules.map { it.department }.distinct().sorted()
 

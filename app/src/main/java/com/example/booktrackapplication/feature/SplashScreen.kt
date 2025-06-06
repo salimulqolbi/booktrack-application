@@ -6,13 +6,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,8 +38,6 @@ fun SplashScreen(
     navController: NavController,
     viewModel: RegistrationViewModel = koinViewModel()
 ) {
-    val context = LocalContext.current
-
     val logoScale = remember { Animatable(0f) }
     val logoOffsetX = remember { Animatable(0f) }
     val logoRotation = remember { Animatable(0f) }
@@ -66,7 +62,6 @@ fun SplashScreen(
             )
         )
 
-        // Step 2: Mulai animasi logo dan teks secara bersamaan
         scope.launch {
             // Logo geser kiri
             logoOffsetX.animateTo(
@@ -100,18 +95,6 @@ fun SplashScreen(
 
         delay(1000L)
 
-//        val token = viewModel.getToken()
-//        if (token.isNullOrEmpty()) {
-//            navController.navigate("login") {
-//                popUpTo("splash") { inclusive = true }
-//            }
-//        } else {
-//            viewModel.getUser()
-//            navController.navigate("main") {
-//                popUpTo("splash") { inclusive = true }
-//            }
-//        }
-
         if (!userState.value.isLoading) {
             if (userState.value.user != null) {
                 navController.navigate("main") {
@@ -125,17 +108,6 @@ fun SplashScreen(
             }
         }
     }
-
-//    LaunchedEffect(Unit) {
-////        navController.navigate("login") {
-////            popUpTo("splash") { inclusive = true }
-////        }
-//
-//    }
-
-//    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//        Text(text = "Splash Screen", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-//    }
 
     Box(
         modifier = Modifier

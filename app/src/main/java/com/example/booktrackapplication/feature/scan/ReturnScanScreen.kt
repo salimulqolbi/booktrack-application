@@ -3,7 +3,6 @@ package com.example.booktrackapplication.feature.scan
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.navigation.NavController
@@ -29,12 +28,9 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -114,7 +110,6 @@ fun ReturnScanScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black),
-//        snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { paddingValues ->
             Box(
                 modifier = Modifier
@@ -155,14 +150,6 @@ fun ReturnScanScreen(
                                                         onBarcodeScanned(value)
                                                         break
                                                     }
-//                                                    code.rawValue?.let { value ->
-//                                                        canScan = false
-//                                                        onBarcodeScanned(value)
-//                                                        break
-////                                                        scanner.close()
-////                                                        imageProxy.close()
-////                                                        return@addOnSuccessListener
-//                                                    }
                                                 }
                                                 imageProxy.close()
                                             }

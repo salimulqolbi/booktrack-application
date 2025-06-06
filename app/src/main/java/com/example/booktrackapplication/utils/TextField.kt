@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -49,7 +48,6 @@ fun ProfileNumberField(
     isError: Boolean = false,
     errorMessage: String? = null
 ) {
-//    val textValue = rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = modifier
@@ -63,19 +61,16 @@ fun ProfileNumberField(
                 else Modifier
             )
             .padding(start = 12.dp)
-        // Padding agar tampilan lebih rapi
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            // BasicTextField sebagai input nomor
             BasicTextField(
                 value = value,
                 onValueChange = {
-                    if (it.all { char -> char.isDigit() }) { // Hanya menerima angka
-//                        textValue.value = it
+                    if (it.all { char -> char.isDigit() }) {
                         onValueChange(it)
                     }
                 },
@@ -107,7 +102,7 @@ fun ProfileNumberField(
                         innerTextField()
                     }
                 },
-                modifier = Modifier.weight(1f) // Agar input bisa melebar
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -153,11 +148,11 @@ fun NumberTextField(
             modifier = Modifier.fillMaxSize()
         ) {
 
-            // BasicTextField sebagai input nomor
+
             BasicTextField(
                 value = textValue.value,
                 onValueChange = {
-                    if (it.all { char -> char.isDigit() }) { // Hanya menerima angka
+                    if (it.all { char -> char.isDigit() }) {
                         textValue.value = it
                         onValueChange(it)
                     }
@@ -190,7 +185,7 @@ fun NumberTextField(
                         innerTextField()
                     }
                 },
-                modifier = Modifier.weight(1f) // Agar input bisa melebar
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -220,18 +215,16 @@ fun PhoneNumberTextField(
             .height(40.dp)
             .background(Color(0xffF7F8FC), shape = RoundedCornerShape(8.dp))
             .padding(start = 12.dp)
-        // Padding agar tampilan lebih rapi
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxSize()
         ) {
-            // BasicTextField sebagai input nomor
             BasicTextField(
                 value = textValue.value,
                 onValueChange = {
-                    if (it.all { char -> char.isDigit() }) { // Hanya menerima angka
+                    if (it.all { char -> char.isDigit() }) {
                         textValue.value = it
                         onValueChange(it)
                     }
@@ -264,7 +257,7 @@ fun PhoneNumberTextField(
                         innerTextField()
                     }
                 },
-                modifier = Modifier.weight(1f) // Agar input bisa melebar
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -325,7 +318,6 @@ fun PhoneNumberTextField(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Leading Icon jika ada
                     if (leadingIcon != null) {
                         leadingIcon()
                     }
@@ -342,8 +334,6 @@ fun PhoneNumberTextField(
                         }
                         innerTextField()
                     }
-
-                    // Trailing Icon untuk toggle password visibility
                     IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
                         Icon(
                             painter = if (passwordVisible.value) painterResource(id = R.drawable.eye) else painterResource(id = R.drawable.eye_slash),

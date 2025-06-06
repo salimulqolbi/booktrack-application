@@ -12,7 +12,5 @@ data class LoginResponse(
 
 @Serializable
 data class ErrorLoginResponse(
-//    val message: Map<String, List<String>>
-//    val message: String
     val message: JsonElement
 )

@@ -7,16 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.BottomAppBar
 import androidx.compose.material.FabPosition
 import androidx.compose.material.FloatingActionButton
@@ -24,7 +20,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,7 +61,6 @@ fun MainScreen(navController: NavController) {
                 onClick = { showWarningDialog = true },
                 backgroundColor = Color.Black,
                 contentColor = Color.White,
-//                shape = CircleShape
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_scan_qr),
@@ -117,11 +111,6 @@ fun BottomNavigationBar(bottomNavController: NavController) {
     BottomAppBar(
         backgroundColor = Color.White,
         modifier = Modifier
-//            .padding(
-//                bottom = WindowInsets.navigationBars
-//                    .asPaddingValues()
-//                    .calculateBottomPadding()
-//            )
             .navigationBarsPadding()
             .height(68.dp)
     ) {
@@ -137,9 +126,8 @@ fun BottomNavigationBar(bottomNavController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f)) // Memberi ruang untuk FAB
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Items di kanan (Riwayat & Profil)
         Row(
             modifier = Modifier
                 .weight(2f)
@@ -156,10 +144,6 @@ fun BottomNavigationBar(bottomNavController: NavController) {
 @Composable
 fun BottomNavItem(navController: NavController, item: NavItems, currentRoute: String?) {
     val isSelected = currentRoute == item.route
-    Log.d(
-        "BottomNavItem",
-        "Route: ${item.route}, currentRoute: $currentRoute, isSelected: $isSelected"
-    )
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

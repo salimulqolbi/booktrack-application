@@ -46,7 +46,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,7 +62,6 @@ fun ReturnLoanScreen(
     navController: NavController,
     viewModel: MainViewmodel = koinViewModel()
 ) {
-//    val books = viewModel.loanedBooks
     val books = viewModel.returnLoanedBooks
 
     val returnUiState by viewModel.returnUiState.collectAsStateWithLifecycle()
@@ -77,8 +75,6 @@ fun ReturnLoanScreen(
     LaunchedEffect(Unit) {
         viewModel.clearSubmitMessage()
     }
-
-    val isComplete = books.size == bookCount
 
     Scaffold(
         modifier = Modifier
@@ -292,7 +288,6 @@ fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
                     Log.e("AsyncImage", "Gagal load gambar: ${it.result.throwable}")
                 }
             )
-            Log.d("book", "${book.coverUrl}")
         }
 
         Spacer(modifier = Modifier.width(8.dp))

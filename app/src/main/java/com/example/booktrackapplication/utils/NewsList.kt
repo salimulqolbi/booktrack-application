@@ -8,13 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -48,7 +44,6 @@ fun NewsList(newsList: List<NewsItems>,onNewsClick: () -> Unit = {}) {
                 newsItems = news,
                 onNewsClick = {onNewsClick()}
             )
-//            Spacer(modifier = Modifier.height(12.dp))
             Divider()
         }
     }
@@ -110,7 +105,6 @@ fun NewsCard(newsItems: NewsItems, modifier: Modifier = Modifier, onNewsClick: (
             }
 
             FlowRow(
-//                modifier = Modifier.padding(top = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {

@@ -1,8 +1,6 @@
 package com.example.booktrack.feature.home
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +23,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,12 +52,6 @@ fun DetailBookScreen(
 ) {
 
     val book = viewmodel.scannedBook
-
-//    val scannedBook by viewmodel.scannedBook
-    LaunchedEffect(book) {
-        Log.d("BOOK_DEBUG", "Scanned Book value: $book")
-    }
-
 
     Scaffold(
         modifier = Modifier.fillMaxSize().padding(top = 24.dp),
@@ -121,7 +112,6 @@ fun DetailBookScreen(
                                 .height(144.dp)
                                 .padding(bottom = 12.dp),
                         )
-                    Log.d("book", "${book}")
                         Text(
                             text = book.title,
                             fontFamily = ManropeFamily,
@@ -320,15 +310,6 @@ fun DetailBookScreen(
                                                     .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
                                                 contentAlignment = Alignment.Center
                                             ) {
-//                                                book.borrowedBy?.let { it1 ->
-//                                                    Text(
-//                                                        text = it1.name ?: "-",
-//                                                        fontSize = 10.sp,
-//                                                        fontFamily = ManropeFamily,
-//                                                        fontWeight = FontWeight.SemiBold,
-//                                                        color = Color(0xff333333)
-//                                                    )
-//                                                }
                                                 Text(
                                                     text = book.borrowedBy?.name ?: "-",
                                                     fontSize = 10.sp,
@@ -447,21 +428,6 @@ fun DetailBookScreen(
                                                 modifier = Modifier,
                                                 contentAlignment = Alignment.Center
                                             ) {
-//                                                book.borrowedBy?.let { it1 ->
-//                                                    Text(
-//                                                        text = it1.phoneNumber ?: "-",
-//                                                        fontSize = 10.sp,
-//                                                        modifier = Modifier.padding(
-//                                                            start = 12.dp,
-//                                                            top = 4.dp,
-//                                                            bottom = 4.dp
-//                                                        ),
-//                                                        fontFamily = ManropeFamily,
-//                                                        fontWeight = FontWeight.SemiBold,
-//                                                        color = Color(0xff333333)
-//                                                    )
-//                                                }
-
                                                 Text(
                                                     text = book?.borrowedBy?.phoneNumber ?: "-",
                                                     fontSize = 10.sp,

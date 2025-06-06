@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,12 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,7 +37,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -84,10 +77,6 @@ fun BookLoanScreen(
         } else {
             null
         }
-    }
-
-    LaunchedEffect(Unit) {
-        Log.d("BookLoanScreen", "Jumlah buku: ${viewModel.loanedBooks.size}")
     }
 
     Scaffold(
@@ -216,7 +205,6 @@ fun BookLoanScreen(
                         }
 
                         Text(
-//                            text = "${books.size}/$bookCount",
                             text = "${books.size}/$bookCount",
                             fontSize = 12.sp,
                             color = Color(0xff111111).copy(0.6f),
@@ -268,29 +256,6 @@ fun BookLoanScreen(
         )
     }
 
-//    uiState.errorMessage?.let { error ->
-//        AlertDialog(
-//            onDismissRequest = { viewModel.clearError() },
-//            title = { Text("Peminjaman Gagal") },
-//            text = { Text(error) },
-////            text = {
-////                Box(modifier = Modifier.heightIn(max = 300.dp)) {
-////                    Text(
-////                        text = error,
-////                        modifier = Modifier.verticalScroll(rememberScrollState())
-////                    )
-////                }
-////            },
-//            confirmButton = {
-//                TextButton(onClick = {
-//                    viewModel.clearError()
-//                }) {
-//                    Text("OK")
-//                }
-//            }
-//        )
-//    }
-
     uiState.errorMessage?.let { error ->
         AlertDialog(
             onDismissRequest = { viewModel.clearError() },
@@ -323,7 +288,6 @@ fun BookLoanScreen(
 
 @Composable
 fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
-    Log.d("BookItem", "Book: ${book.title}, submitted: ${book.isSubmitted}")
 
     Row(
         modifier = Modifier
@@ -352,7 +316,6 @@ fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
                     Log.e("AsyncImage", "Gagal load gambar: ${it.result.throwable}")
                 }
             )
-            Log.d("book", "${book.coverUrl}")
         }
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -375,7 +338,6 @@ fun BookItem(book: BookData, onDeleteClick: () -> Unit) {
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
-            Log.d("book", "${book.isSubmitted}")
 
             Card(
                 shape = RoundedCornerShape(80),

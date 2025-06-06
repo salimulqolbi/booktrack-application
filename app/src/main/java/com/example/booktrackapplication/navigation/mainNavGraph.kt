@@ -1,6 +1,5 @@
 package com.example.booktrack.navigation
 
-import androidx.compose.runtime.internal.composableLambda
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -19,7 +18,6 @@ import com.example.booktrackapplication.feature.scan.ReturnScanScreen
 import com.example.booktrackapplication.feature.scan.SearchBookScreen
 import com.example.booktrackapplication.feature.scan.SearchScanScreen
 import com.example.booktrackapplication.viewmodel.MainViewmodel
-import org.koin.androidx.compose.koinViewModel
 
 
 fun NavGraphBuilder.mainNavGraph(navController: NavController, viewModel: MainViewmodel) {

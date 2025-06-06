@@ -110,7 +110,7 @@ class RegistrationViewModel(
 
                 val result = authRepository.activeAccount(request)
 
-                withContext(Dispatchers.Main) { // Kembali ke UI thread
+                withContext(Dispatchers.Main) {
                     when (result) {
                         is Resource.Success -> {
                             registrationUiState = registrationUiState.copy(
@@ -121,7 +121,7 @@ class RegistrationViewModel(
                                 passwordError = null
                             )
                             Log.d("RegistrationViewModel", "activeAccount: ${result.data}")
-                            onResult(true) // Panggil callback jika sukses
+                            onResult(true)
                         }
 
                         is Resource.Error -> {
@@ -152,13 +152,11 @@ class RegistrationViewModel(
                             )
 
                             if (isAccountAlreadyActive) {
-                                // Munculkan dialog khusus di UI menggunakan flag khusus
                                 registrationUiState = registrationUiState.copy(
                                     errorMessage = "Akun sudah aktif"
                                 )
                             }
 
-                            Log.e("RegistrationViewModel", "activeAccount: ${result.message}")
                             onResult(false)
                         }
                     }
@@ -207,14 +205,11 @@ class RegistrationViewModel(
                                 dataStoreManager.saveUser(it)
                             }
 
-                            Log.d("book", "User setelah login: ${_user.value}")
-
                             loginstrationUiState = loginstrationUiState.copy(
                                 isLoading = false,
                                 isSuccess = true,
                                 response = loginResponse
                             )
-                            Log.d("book", "Login berhasil: ${loginResponse.user?.name}")
                             onResult(true)
                         }
 

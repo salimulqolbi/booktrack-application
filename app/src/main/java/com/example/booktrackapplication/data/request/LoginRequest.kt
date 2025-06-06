@@ -1,6 +1,5 @@
 package com.example.booktrackapplication.data.request
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable

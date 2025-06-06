@@ -1,11 +1,8 @@
 package com.example.booktrack.data.repository.main
 
-import android.util.Log
 import com.example.booktrack.data.response.BookResponse
 import com.example.booktrack.data.response.BorrowStatusResponse
 import com.example.booktrack.data.response.CurriculumResponse
-import com.example.booktrack.data.response.EventsScheduleResponse
-import com.example.booktrack.data.response.UserResponse
 import com.example.booktrack.data.response.ValidateBorrowingDateResponse
 import com.example.booktrack.utils.Resource
 import com.example.booktrackapplication.data.datastore.DataStoreManager
@@ -17,11 +14,8 @@ import com.example.booktrackapplication.data.response.BorrowBooksResponse
 import com.example.booktrackapplication.data.response.GetUserResponse
 import com.example.booktrackapplication.data.response.HistoryResponse
 import com.example.booktrackapplication.data.response.ReturnBooksResponse
-import com.example.booktrackapplication.data.response.ValidateReturningDateResponse
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
-import kotlinx.serialization.json.Json
-import java.lang.Error
 
 class MainRepositoryImpl(
     private val apiService: MainApiService,
@@ -117,8 +111,6 @@ class MainRepositoryImpl(
             if(result.success) {
                 Resource.Success(result)
             } else {
-//                Resource.Error(result.message)
-//                val json = Json.encodeToString(result)
                 Resource.Error(result.message, result)
             }
         } catch (e: Exception) {

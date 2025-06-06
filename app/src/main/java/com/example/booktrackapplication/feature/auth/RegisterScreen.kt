@@ -157,8 +157,6 @@ fun RegistrationScreen(
                             onValueChange = {
                                 viewModel.onNisChange(it)
                             },
-//                            isError = state.isError,
-//                            errorMessage = state.errorMessage
                             isError = state.nisError != null,
                             errorMessage = state.nisError
                         )

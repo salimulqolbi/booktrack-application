@@ -228,7 +228,7 @@ fun SemesterCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 12.dp)
-            .animateContentSize( // animasi ukuran saat expand/collapse
+            .animateContentSize(
                 animationSpec = tween(
                     durationMillis = 300,
                     easing = FastOutSlowInEasing
