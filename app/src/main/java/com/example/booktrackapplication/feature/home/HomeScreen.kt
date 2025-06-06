@@ -82,8 +82,7 @@ import com.example.booktrackapplication.viewmodel.RegistrationViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-
-//import org.koin.androidx.compose.get
+import java.util.Calendar
 
 @Composable
 fun HomeScreen(
@@ -142,9 +141,16 @@ fun HomeScreen(
         }
     }
 
-    val state by mainViewmodel.uiState.collectAsState()
+    val currentHour = remember {
+        Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    }
 
-//    val history = mainViewmodel.searchHistory
+    val greeting = when(currentHour) {
+        in 0..10 -> "Selamat Pagi"
+        in 11..14 -> "Selamat Siang"
+        in 15..18 -> "Selamat Sore"
+        else -> "Selamat Malam"
+    }
 
     if (isLoading) {
         Box(
@@ -175,7 +181,7 @@ fun HomeScreen(
                         modifier = Modifier
                     ) {
                         Text(
-                            "Selamat Pagi, ",
+                            "$greeting ",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.ExtraLight,
                             fontFamily = ManropeFamily,
@@ -202,36 +208,6 @@ fun HomeScreen(
                 }
             )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    "Informasi Terbaru",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    fontFamily = ManropeFamily,
-                    color = Color.Black
-                )
-
-                Text(
-                    "Lihat Jadwal",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 12.sp,
-                    fontFamily = ManropeFamily,
-                    color = Color(0xff2846CF),
-                    modifier = Modifier
-                        .clickable {
-                            navController.navigate("schedule_list") {
-                                launchSingleTop = true
-                            }
-                        }
-                )
-            }
-
             // HOME CARD
             AnimatedVisibility(visible = !isSearchActive) {
                 HomeCard(
@@ -240,6 +216,22 @@ fun HomeScreen(
                             launchSingleTop = true
                         }
                     }
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Panduan dan Informasi",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp,
+                    fontFamily = ManropeFamily,
+                    color = Color.Black
                 )
             }
 
@@ -252,67 +244,6 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(140.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .border(1.dp, Color(0xffEBEBEB), RoundedCornerShape(16.dp))
-                            .clickable {
-                                navController.navigate("faq")
-                            },
-                        backgroundColor = Color(0xffF7F8FC)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(vertical = 12.dp, horizontal = 20.dp)
-                                .height(112.dp)
-                                .width(120.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White)
-                                    .border(1.dp, Color(0xffEBEBEB), CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                Icon(
-                                    painter = painterResource(id = R.drawable.tabler_icon_help_octagon),
-                                    contentDescription = " ",
-                                    modifier = Modifier.size(16.dp),
-                                    tint = Color(0xff2846CF)
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier.padding(top = 6.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(
-                                    "FAQ",
-                                    color = Color(0xff222222),
-                                    fontFamily = ManropeFamily,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 14.sp,
-                                )
-
-                                Text(
-                                    "Temukan Jawaban",
-                                    color = Color.Gray,
-                                    fontSize = 10.sp,
-                                    fontFamily = ManropeFamily,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-
-                        }
-                    }
-
                     Card(
                         modifier = Modifier
                             .weight(1f)
@@ -372,6 +303,67 @@ fun HomeScreen(
                                     textAlign = TextAlign.Center,
                                     maxLines = 1,
                                     overflow = TextOverflow.Clip
+                                )
+                            }
+
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(140.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(1.dp, Color(0xffEBEBEB), RoundedCornerShape(16.dp))
+                            .clickable {
+                                navController.navigate("faq")
+                            },
+                        backgroundColor = Color(0xffF7F8FC)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(vertical = 12.dp, horizontal = 20.dp)
+                                .height(112.dp)
+                                .width(120.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White)
+                                    .border(1.dp, Color(0xffEBEBEB), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                Icon(
+                                    painter = painterResource(id = R.drawable.tabler_icon_help_octagon),
+                                    contentDescription = " ",
+                                    modifier = Modifier.size(16.dp),
+                                    tint = Color(0xff2846CF)
+                                )
+                            }
+
+                            Column(
+                                modifier = Modifier.padding(top = 6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    "FAQ",
+                                    color = Color(0xff222222),
+                                    fontFamily = ManropeFamily,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                )
+
+                                Text(
+                                    "Temukan Jawaban",
+                                    color = Color.Gray,
+                                    fontSize = 10.sp,
+                                    fontFamily = ManropeFamily,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
 
