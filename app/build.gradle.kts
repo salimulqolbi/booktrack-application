@@ -1,8 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
-//    id("kotlin-kapt")
-//    id("com.google.dagger.hilt.android")
     kotlin("plugin.serialization") version "2.1.20"
     alias(libs.plugins.kotlin.android)
 }
@@ -16,7 +14,7 @@ android {
         minSdk = 27
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,7 +24,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -92,8 +90,6 @@ dependencies {
 
     //COIL
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
-//    implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
-//    implementation("io.coil-kt.coil3:coil-network-ktor2:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-ktor3:3.1.0")
 
     //KOIN

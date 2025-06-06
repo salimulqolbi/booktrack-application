@@ -114,7 +114,6 @@ fun BottomNavigationBar(bottomNavController: NavController) {
             .navigationBarsPadding()
             .height(68.dp)
     ) {
-        // Items di kiri (Home & Aktivitas)
         Row(
             modifier = Modifier
                 .weight(2f)

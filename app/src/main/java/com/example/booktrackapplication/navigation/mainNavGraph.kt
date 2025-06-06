@@ -26,7 +26,12 @@ fun NavGraphBuilder.mainNavGraph(navController: NavController, viewModel: MainVi
         composable("faq") { FaqScreen(navController) }
         composable("detail_list") { DetailListScreen(navController) }
         composable("schedule_list") { ScheduleList(navController) }
-        composable("about_us") { AboutScreen(navController) }
+        composable("about_us") {
+            AboutScreen(
+                navController,
+//                versionName = BuildConfig.VERSION_NAME
+            )
+        }
         composable("news_content") {NewsContentScreen(navController)}
         composable("scan_code") {
             ScanScreen(
