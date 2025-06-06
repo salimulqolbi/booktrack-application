@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -280,179 +282,189 @@ fun SearchBookScreen(
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .wrapContentHeight()
                                         .padding(top = 12.dp),
                                     shape = RoundedCornerShape(8.dp),
                                     border = BorderStroke(1.dp, Color(0xffEBEBEB))
                                 ) {
+//                                    Column {
+//                                        // Row 1
+//                                        Row(
+//                                            modifier = Modifier
+//                                        ) {
+//                                            // Column 1
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .drawBehind {
+//                                                        drawIntoCanvas { canvas ->
+//                                                            val paint = Paint().apply {
+//                                                                color = Color(0xffEBEBEB)
+//                                                                strokeWidth = 1.dp.toPx()
+//                                                            }
+//                                                            val endY = size.height
+//                                                            canvas.drawLine(
+//                                                                p1 = Offset(x = size.width, y = 0f),
+//                                                                p2 = Offset(x = size.width, y = endY),
+//                                                                paint = paint
+//                                                            )
+//                                                        }
+//                                                    }
+//                                                    .width(80.dp)
+//                                                    .padding(top = 4.dp, bottom = 4.dp, start = 10.dp),
+//                                            ) {
+//                                                Text(
+//                                                    text = "Nama Siswa",
+//                                                    fontSize = 10.sp,
+//                                                    fontFamily = ManropeFamily,
+//                                                    fontWeight = FontWeight.Medium,
+//                                                    color = Color.Black.copy(alpha = 0.6f)
+//                                                )
+//                                            }
+//                                            // Column 2
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
+//                                                contentAlignment = Alignment.Center
+//                                            ) {
+//                                                book!!.borrowedBy?.let { it1 ->
+//                                                    Text(
+//                                                        text = it1.name,
+//                                                        fontSize = 10.sp,
+//                                                        fontFamily = ManropeFamily,
+//                                                        fontWeight = FontWeight.SemiBold,
+//                                                        color = Color(0xff333333)
+//                                                    )
+//                                                }
+//                                            }
+//                                        }
+//
+//                                        // Row 2
+//                                        Row(
+//                                            modifier = Modifier
+//                                                .fillMaxWidth()
+//                                                .border(BorderStroke(1.dp, Color(0xffEBEBEB)))
+//                                        ) {
+//                                            // Column 1
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .drawBehind {
+//                                                        drawIntoCanvas { canvas ->
+//                                                            val paint = Paint().apply {
+//                                                                color = Color(0xffEBEBEB)
+//                                                                strokeWidth = 1.dp.toPx()
+//                                                            }
+//                                                            val endY = size.height
+//                                                            canvas.drawLine(
+//                                                                p1 = Offset(x = size.width, y = 0f),
+//                                                                p2 = Offset(x = size.width, y = endY),
+//                                                                paint = paint
+//                                                            )
+//                                                        }
+//                                                    }
+//                                                    .width(80.dp),
+//                                            ) {
+//                                                Text(
+//                                                    text = "Kelas",
+//                                                    modifier = Modifier
+//                                                        .padding(
+//                                                            top = 4.dp,
+//                                                            bottom = 4.dp,
+//                                                            start = 10.dp
+//                                                        ),
+//                                                    fontSize = 10.sp,
+//                                                    fontFamily = ManropeFamily,
+//                                                    fontWeight = FontWeight.Medium,
+//                                                    color = Color.Black.copy(alpha = 0.6f)
+//                                                )
+//                                            }
+//                                            // Column 2
+//                                            Box(
+//                                                modifier = Modifier,
+//                                                contentAlignment = Alignment.Center
+//                                            ) {
+//                                                Text(
+//                                                    text = "${convertToRoman(book!!.grade)} ${extractAbbreviation(
+//                                                        book!!.department)} ${book!!.borrowedBy?.classIndex} ",
+//                                                    fontSize = 10.sp,
+//                                                    fontFamily = ManropeFamily,
+//                                                    modifier = Modifier.padding(
+//                                                        start = 12.dp,
+//                                                        top = 4.dp,
+//                                                        bottom = 4.dp
+//                                                    ),
+//                                                    fontWeight = FontWeight.SemiBold,
+//                                                    color = Color(0xff333333)
+//                                                )
+//                                            }
+//                                        }
+//
+//                                        // Row 3
+//                                        Row(
+//                                            modifier = Modifier
+//                                                .fillMaxWidth()
+//                                        ) {
+//                                            Box(
+//                                                modifier = Modifier
+//                                                    .drawBehind {
+//                                                        drawIntoCanvas { canvas ->
+//                                                            val paint = Paint().apply {
+//                                                                color = Color(0xffEBEBEB)
+//                                                                strokeWidth = 1.dp.toPx()
+//                                                            }
+//                                                            val endY = size.height
+//                                                            canvas.drawLine(
+//                                                                p1 = Offset(x = size.width, y = 0f),
+//                                                                p2 = Offset(x = size.width, y = endY),
+//                                                                paint = paint
+//                                                            )
+//                                                        }
+//                                                    }
+//                                                    .width(80.dp),
+//                                            ) {
+//                                                Text(
+//                                                    text = "No. Wa",
+//                                                    modifier = Modifier
+//                                                        .padding(
+//                                                            top = 4.dp,
+//                                                            bottom = 4.dp,
+//                                                            start = 10.dp
+//                                                        ),
+//                                                    fontSize = 10.sp,
+//                                                    fontFamily = ManropeFamily,
+//                                                    fontWeight = FontWeight.Medium,
+//                                                    color = Color.Black.copy(alpha = 0.6f)
+//                                                )
+//                                            }
+//                                            // Column 2
+//                                            Box(
+//                                                modifier = Modifier,
+//                                                contentAlignment = Alignment.Center
+//                                            ) {
+//                                                book!!.borrowedBy?.let { it1 ->
+//                                                    Text(
+//                                                        text = it1.phoneNumber,
+//                                                        fontSize = 10.sp,
+//                                                        modifier = Modifier.padding(
+//                                                            start = 12.dp,
+//                                                            top = 4.dp,
+//                                                            bottom = 4.dp
+//                                                        ),
+//                                                        fontFamily = ManropeFamily,
+//                                                        fontWeight = FontWeight.SemiBold,
+//                                                        color = Color(0xff333333)
+//                                                    )
+//                                                }
+//                                            }
+//                                        }
+//                                    }
+
                                     Column {
-                                        // Row 1
-                                        Row(
-                                            modifier = Modifier
-                                        ) {
-                                            // Column 1
-                                            Box(
-                                                modifier = Modifier
-                                                    .drawBehind {
-                                                        drawIntoCanvas { canvas ->
-                                                            val paint = Paint().apply {
-                                                                color = Color(0xffEBEBEB)
-                                                                strokeWidth = 1.dp.toPx()
-                                                            }
-                                                            val endY = size.height
-                                                            canvas.drawLine(
-                                                                p1 = Offset(x = size.width, y = 0f),
-                                                                p2 = Offset(x = size.width, y = endY),
-                                                                paint = paint
-                                                            )
-                                                        }
-                                                    }
-                                                    .width(80.dp)
-                                                    .padding(top = 4.dp, bottom = 4.dp, start = 10.dp),
-                                            ) {
-                                                Text(
-                                                    text = "Nama Siswa",
-                                                    fontSize = 10.sp,
-                                                    fontFamily = ManropeFamily,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = Color.Black.copy(alpha = 0.6f)
-                                                )
-                                            }
-                                            // Column 2
-                                            Box(
-                                                modifier = Modifier
-                                                    .padding(start = 12.dp, top = 4.dp, bottom = 4.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                book!!.borrowedBy?.let { it1 ->
-                                                    Text(
-                                                        text = it1.name,
-                                                        fontSize = 10.sp,
-                                                        fontFamily = ManropeFamily,
-                                                        fontWeight = FontWeight.SemiBold,
-                                                        color = Color(0xff333333)
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        // Row 2
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .border(BorderStroke(1.dp, Color(0xffEBEBEB)))
-                                        ) {
-                                            // Column 1
-                                            Box(
-                                                modifier = Modifier
-                                                    .drawBehind {
-                                                        drawIntoCanvas { canvas ->
-                                                            val paint = Paint().apply {
-                                                                color = Color(0xffEBEBEB)
-                                                                strokeWidth = 1.dp.toPx()
-                                                            }
-                                                            val endY = size.height
-                                                            canvas.drawLine(
-                                                                p1 = Offset(x = size.width, y = 0f),
-                                                                p2 = Offset(x = size.width, y = endY),
-                                                                paint = paint
-                                                            )
-                                                        }
-                                                    }
-                                                    .width(80.dp),
-                                            ) {
-                                                Text(
-                                                    text = "Kelas",
-                                                    modifier = Modifier
-                                                        .padding(
-                                                            top = 4.dp,
-                                                            bottom = 4.dp,
-                                                            start = 10.dp
-                                                        ),
-                                                    fontSize = 10.sp,
-                                                    fontFamily = ManropeFamily,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = Color.Black.copy(alpha = 0.6f)
-                                                )
-                                            }
-                                            // Column 2
-                                            Box(
-                                                modifier = Modifier,
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    text = "${convertToRoman(book!!.grade)} ${extractAbbreviation(
-                                                        book!!.department)} ${book!!.borrowedBy?.classIndex} ",
-                                                    fontSize = 10.sp,
-                                                    fontFamily = ManropeFamily,
-                                                    modifier = Modifier.padding(
-                                                        start = 12.dp,
-                                                        top = 4.dp,
-                                                        bottom = 4.dp
-                                                    ),
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = Color(0xff333333)
-                                                )
-                                            }
-                                        }
-
-                                        // Row 3
-                                        Row(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                        ) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .drawBehind {
-                                                        drawIntoCanvas { canvas ->
-                                                            val paint = Paint().apply {
-                                                                color = Color(0xffEBEBEB)
-                                                                strokeWidth = 1.dp.toPx()
-                                                            }
-                                                            val endY = size.height
-                                                            canvas.drawLine(
-                                                                p1 = Offset(x = size.width, y = 0f),
-                                                                p2 = Offset(x = size.width, y = endY),
-                                                                paint = paint
-                                                            )
-                                                        }
-                                                    }
-                                                    .width(80.dp),
-                                            ) {
-                                                Text(
-                                                    text = "No. Wa",
-                                                    modifier = Modifier
-                                                        .padding(
-                                                            top = 4.dp,
-                                                            bottom = 4.dp,
-                                                            start = 10.dp
-                                                        ),
-                                                    fontSize = 10.sp,
-                                                    fontFamily = ManropeFamily,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = Color.Black.copy(alpha = 0.6f)
-                                                )
-                                            }
-                                            // Column 2
-                                            Box(
-                                                modifier = Modifier,
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                book!!.borrowedBy?.let { it1 ->
-                                                    Text(
-                                                        text = it1.phoneNumber,
-                                                        fontSize = 10.sp,
-                                                        modifier = Modifier.padding(
-                                                            start = 12.dp,
-                                                            top = 4.dp,
-                                                            bottom = 4.dp
-                                                        ),
-                                                        fontFamily = ManropeFamily,
-                                                        fontWeight = FontWeight.SemiBold,
-                                                        color = Color(0xff333333)
-                                                    )
-                                                }
-                                            }
-                                        }
+                                        InfoRow(label = "Nama Siswa", value = book!!.borrowedBy?.name ?: "-")
+                                        InfoRow(
+                                            label = "Kelas",
+                                            value = "${convertToRoman(book!!.grade)} ${extractAbbreviation(book!!.department)} ${book!!.borrowedBy?.classIndex}"
+                                        )
+                                        InfoRow(label = "No. Wa", value = book!!.borrowedBy?.phoneNumber ?: "-")
                                     }
                                 }
                             }
@@ -485,4 +497,55 @@ fun SearchBookScreen(
             }
         }
     )
+}
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 28.dp) // pastikan tinggi minimum
+            .border(BorderStroke(1.dp, Color(0xffEBEBEB))) // optional jika ingin garis antar-row
+    ) {
+        Box(
+            modifier = Modifier
+                .width(80.dp)
+                .padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
+                .drawBehind {
+                    drawIntoCanvas { canvas ->
+                        val paint = Paint().apply {
+                            color = Color(0xffEBEBEB)
+                            strokeWidth = 1.dp.toPx()
+                        }
+                        canvas.drawLine(
+                            Offset(size.width, 0f),
+                            Offset(size.width, size.height),
+                            paint
+                        )
+                    }
+                },
+        ) {
+            Text(
+                text = label,
+                fontSize = 10.sp,
+                fontFamily = ManropeFamily,
+                fontWeight = FontWeight.Medium,
+                color = Color.Black.copy(alpha = 0.6f)
+            )
+        }
+        Box(
+            modifier = Modifier
+                .padding(start = 12.dp, top = 4.dp, bottom = 4.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Text(
+                text = value,
+                fontSize = 10.sp,
+                fontFamily = ManropeFamily,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xff333333)
+            )
+        }
+    }
 }

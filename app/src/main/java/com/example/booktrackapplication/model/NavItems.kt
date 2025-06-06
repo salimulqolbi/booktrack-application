@@ -16,7 +16,7 @@ sealed class NavItems(
     )
 
     object Activity : NavItems(
-        title = "Aktifitas",
+        title = "Aktivitas",
         route = "activity",
         selectedIcon = R.drawable.aktivitas_selected,
         unselectedIcon = R.drawable.aktivitas_unselected

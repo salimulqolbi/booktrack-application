@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -114,14 +115,14 @@ fun BottomNavigationBar(bottomNavController: NavController) {
     val rightItems = listOf(NavItems.History, NavItems.Profile)
 
     BottomAppBar(
-//        cutoutShape = CircleShape,
         backgroundColor = Color.White,
         modifier = Modifier
-            .padding(
-                bottom = WindowInsets.navigationBars
-                    .asPaddingValues()
-                    .calculateBottomPadding()
-            )
+//            .padding(
+//                bottom = WindowInsets.navigationBars
+//                    .asPaddingValues()
+//                    .calculateBottomPadding()
+//            )
+            .navigationBarsPadding()
             .height(68.dp)
     ) {
         // Items di kiri (Home & Aktivitas)
@@ -170,6 +171,7 @@ fun BottomNavItem(navController: NavController, item: NavItems, currentRoute: St
                     restoreState = true
                 }
             }
+            .padding(top = 12.dp, bottom = 12.dp)
             .width(52.dp)
 
     ) {
